@@ -4,9 +4,33 @@ import { useAuth } from './AuthContext'
 
 const AppContext = createContext()
 
-const extractData = (response) => {
+export const extractArray = (response, key = null) => {
+  if (!response) return []
+  
+  console.log('[NORMALIZE] Response:', JSON.stringify(response).substring(0, 300))
+  
+  const data = response?.data
+  
+  if (key) {
+    const value = data?.[key] || data?.data?.[key]
+    if (Array.isArray(value)) return value
+  }
+  
+  if (Array.isArray(data)) return data
+  if (data?.transactions && Array.isArray(data.transactions)) return data.transactions
+  if (data?.budgets && Array.isArray(data.budgets)) return data.budgets
+  if (data?.categories && Array.isArray(data.categories)) return data.categories
+  if (data?.data && Array.isArray(data.data)) return data.data
+  
+  if (Array.isArray(response)) return response
+  return []
+}
+
+const extractData = (response, key = null) => {
+  const arr = extractArray(response, key)
+  if (arr.length > 0) return arr
+  
   if (!response) return null
-  console.log('[DEBUG] API Response:', JSON.stringify(response).substring(0, 200))
   if (response.data !== undefined) {
     const data = response.data
     if (Array.isArray(data)) return data
@@ -48,9 +72,9 @@ export function AppProvider({ children }) {
     
     try {
       const transactionsRes = await api.getTransactions()
-      transactionsData = ensureArray(extractData(transactionsRes))
+      transactionsData = extractArray(transactionsRes, 'transactions')
       setTransactions(transactionsData)
-      console.log('[✅] Transactions loaded:', transactionsData?.length || 0)
+      console.log('[✅] Transactions loaded:', transactionsData.length)
     } catch (err) {
       console.error('[❌] Failed to load transactions:', err.message)
       setError('Failed to load transactions')
@@ -58,19 +82,19 @@ export function AppProvider({ children }) {
     
     try {
       let categoriesRes = await api.getCategories()
-      categoriesData = ensureArray(extractData(categoriesRes))
+      categoriesData = extractArray(categoriesRes, 'categories')
       
       if (!categoriesData || categoriesData.length === 0) {
         try {
           const seedRes = await api.seedCategories()
-          categoriesData = ensureArray(extractData(seedRes))
+          categoriesData = extractArray(seedRes, 'categories')
           console.log('[✅] Categories seeded')
         } catch (seedErr) {
           console.log('[❌] Seed categories failed:', seedErr.message)
         }
       }
-      setCategories(ensureArray(categoriesData))
-      console.log('[✅] Categories loaded:', categoriesData?.length || 0)
+      setCategories(categoriesData)
+      console.log('[✅] Categories loaded:', categoriesData.length)
     } catch (err) {
       console.error('[❌] Failed to load categories:', err.message)
       if (categoriesData === null) {
@@ -80,10 +104,9 @@ export function AppProvider({ children }) {
     
     try {
       const budgetsRes = await api.getBudgets()
-      const loadedBudgets = extractData(budgetsRes)
-      budgetsData = ensureArray(loadedBudgets?.budgets || loadedBudgets)
+      budgetsData = extractArray(budgetsRes, 'budgets')
       setBudgets(budgetsData)
-      console.log('[✅] Budgets loaded:', budgetsData?.length || 0)
+      console.log('[✅] Budgets loaded:', budgetsData.length)
     } catch (err) {
       console.error('[❌] Failed to load budgets:', err.message)
       if (budgetsData === null) {
