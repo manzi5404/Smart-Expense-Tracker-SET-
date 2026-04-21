@@ -9,7 +9,8 @@ function RecentTransactions() {
   const navigate = useNavigate()
   const { transactions, categories } = useApp()
 
-  const recentTransactions = transactions.slice(0, 5)
+  const safeTransactions = Array.isArray(transactions) ? transactions : []
+  const recentTransactions = safeTransactions.slice(0, 5)
 
   return (
     <Card>

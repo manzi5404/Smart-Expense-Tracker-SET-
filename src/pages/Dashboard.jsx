@@ -9,6 +9,7 @@ import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from '
 function Dashboard() {
   const { getTotalIncome, getTotalExpenses, getBalance, transactions } = useApp()
 
+  const safeTransactions = Array.isArray(transactions) ? transactions : []
   const totalIncome = getTotalIncome()
   const totalExpenses = getTotalExpenses()
   const balance = getBalance()
@@ -37,7 +38,7 @@ function Dashboard() {
     },
     {
       title: 'Transactions',
-      value: transactions.length.toString(),
+      value: safeTransactions.length.toString(),
       icon: ArrowUpRight,
       color: 'blue',
     },

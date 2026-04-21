@@ -8,10 +8,20 @@ const extractData = (response) => {
   if (!response) return null
   if (response.data !== undefined) {
     const data = response.data
+    if (Array.isArray(data)) return data
     if (data.transactions !== undefined) return data.transactions
+    if (data.data !== undefined && Array.isArray(data.data)) return data.data
     return data
   }
+  if (Array.isArray(response)) return response
   return response
+}
+
+const ensureArray = (data) => {
+  if (Array.isArray(data)) return data
+  if (!data) return []
+  console.warn('[AppContext] Data is not an array:', typeof data, data)
+  return []
 }
 
 export function AppProvider({ children }) {
@@ -37,25 +47,25 @@ export function AppProvider({ children }) {
     
     try {
       const transactionsRes = await api.getTransactions()
-      transactionsData = extractData(transactionsRes)
-      setTransactions(transactionsData || [])
+      transactionsData = ensureArray(extractData(transactionsRes))
+      setTransactions(transactionsData)
     } catch (err) {
       console.error('Failed to load transactions:', err.message)
     }
     
     try {
       let categoriesRes = await api.getCategories()
-      categoriesData = extractData(categoriesRes) || []
+      categoriesData = ensureArray(extractData(categoriesRes))
       
       if (!categoriesData || categoriesData.length === 0) {
         try {
           const seedRes = await api.seedCategories()
-          categoriesData = extractData(seedRes) || []
+          categoriesData = ensureArray(extractData(seedRes))
         } catch (seedErr) {
           console.log('Seed categories failed:', seedErr.message)
         }
       }
-      setCategories(categoriesData || [])
+      setCategories(ensureArray(categoriesData))
     } catch (err) {
       console.error('Failed to load categories:', err.message)
       if (categoriesData === null) {
@@ -66,8 +76,8 @@ export function AppProvider({ children }) {
     try {
       const budgetsRes = await api.getBudgets()
       const loadedBudgets = extractData(budgetsRes)
-      budgetsData = loadedBudgets?.budgets || loadedBudgets || []
-      setBudgets(budgetsData || [])
+      budgetsData = ensureArray(loadedBudgets?.budgets || loadedBudgets)
+      setBudgets(budgetsData)
     } catch (err) {
       console.error('Failed to load budgets:', err.message)
       if (budgetsData === null) {
@@ -93,7 +103,7 @@ export function AppProvider({ children }) {
     
     try {
       const transactionsRes = await api.getTransactions()
-      setTransactions(extractData(transactionsRes) || [])
+      setTransactions(ensureArray(extractData(transactionsRes)))
     } catch (err) {
       console.error('Failed to refresh transactions:', err.message)
     }
@@ -121,7 +131,7 @@ export function AppProvider({ children }) {
     
     try {
       const categoriesRes = await api.getCategories()
-      setCategories(extractData(categoriesRes) || [])
+      setCategories(ensureArray(extractData(categoriesRes)))
     } catch (err) {
       console.error('Failed to refresh categories:', err)
     }
@@ -185,7 +195,7 @@ export function AppProvider({ children }) {
     try {
       const budgetsRes = await api.getBudgets()
       const loadedBudgets = extractData(budgetsRes)
-      setBudgets(loadedBudgets?.budgets || loadedBudgets || [])
+      setBudgets(ensureArray(loadedBudgets?.budgets || loadedBudgets))
     } catch (err) {
       console.error('Failed to refresh budgets:', err)
     }
@@ -237,21 +247,21 @@ export function AppProvider({ children }) {
   }, [categories])
 
   const getTransactionsByType = useCallback((type) => {
-    return transactions.filter(t => t.type === type)
+    return (Array.isArray(transactions) ? transactions : []).filter(t => t.type === type)
   }, [transactions])
 
   const getTransactionsByCategory = useCallback((category) => {
-    return transactions.filter(t => t.category === category)
+    return (Array.isArray(transactions) ? transactions : []).filter(t => t.category === category)
   }, [transactions])
 
   const getTotalIncome = useCallback(() => {
-    return transactions
+    return (Array.isArray(transactions) ? transactions : [])
       .filter(t => t.type === 'income')
       .reduce((sum, t) => sum + (t.amount || 0), 0)
   }, [transactions])
 
   const getTotalExpenses = useCallback(() => {
-    return transactions
+    return (Array.isArray(transactions) ? transactions : [])
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + (t.amount || 0), 0)
   }, [transactions])
@@ -261,7 +271,8 @@ export function AppProvider({ children }) {
   }, [getTotalIncome, getTotalExpenses])
 
   const getSpendingByCategory = useCallback(() => {
-    const expenses = transactions.filter(t => t.type === 'expense')
+    const safeData = Array.isArray(transactions) ? transactions : []
+    const expenses = safeData.filter(t => t.type === 'expense')
     return expenses.reduce((acc, t) => {
       const name = getCategoryName(t.category)
       acc[t.category] = acc[t.category] || { name, amount: 0, color: getCategoryColor(t.category) }
