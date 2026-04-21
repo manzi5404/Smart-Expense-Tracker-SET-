@@ -1,208 +1,107 @@
-const API_BASE = '/api'
+import axios from 'axios';
 
-const handleResponse = async (response) => {
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: 'Network error' }))
-    throw new Error(error.message || 'Something went wrong')
-  }
-  return response.json()
+const API_BASE = import.meta.env.VITE_API_URL;
+
+if (!API_BASE) {
+  throw new Error('VITE_API_URL is missing. Set in environment variables before building.');
 }
 
-// Get auth headers with token
-const getAuthHeaders = () => {
+export const api = axios.create({
+  baseURL: API_BASE,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    const message = error.response?.data?.message || error.message || 'Network error';
+    return Promise.reject(new Error(message));
+  }
+);
+
+const getAuthConfig = () => {
   const token = localStorage.getItem('token');
-  return token ? {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  } : { 'Content-Type': 'application/json' };
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
 
+export const authApi = {
+  login: (email, password) => api.post('/auth/login', { email, password }),
+  register: (name, email, password) => api.post('/auth/register', { name, email, password }),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token, newPassword) => api.post('/auth/reset-password', { token, newPassword })
+};
+
+export const transactionsApi = {
+  getAll: (params) => api.get('/transactions', { params, ...getAuthConfig() }),
+  get: (id) => api.get(`/transactions/${id}`, getAuthConfig()),
+  create: (data) => api.post('/transactions', data, getAuthConfig()),
+  update: (id, data) => api.put(`/transactions/${id}`, data, getAuthConfig()),
+  delete: (id) => api.delete(`/transactions/${id}`, getAuthConfig())
+};
+
+export const categoriesApi = {
+  getAll: () => api.get('/categories', getAuthConfig()),
+  create: (data) => api.post('/categories', data, getAuthConfig()),
+  seed: () => api.post('/categories/seed', {}, getAuthConfig()),
+  delete: (id) => api.delete(`/categories/${id}`, getAuthConfig())
+};
+
+export const reportsApi = {
+  getSummary: (period) => api.get(`/reports/summary?period=${period}`, getAuthConfig()),
+  getSpending: (period) => api.get(`/reports/spending?period=${period}`, getAuthConfig()),
+  getTrend: (months) => api.get(`/reports/trend?months=${months}`, getAuthConfig())
+};
+
+export const budgetsApi = {
+  getAll: () => api.get('/budgets', getAuthConfig()),
+  create: (data) => api.post('/budgets', data, getAuthConfig()),
+  update: (id, data) => api.put(`/budgets/${id}`, data, getAuthConfig()),
+  delete: (id) => api.delete(`/budgets/${id}`, getAuthConfig())
+};
+
+export const profileApi = {
+  get: () => api.get('/profile', getAuthConfig()),
+  update: (data) => api.put('/profile', data, getAuthConfig())
+};
+
+export const notificationsApi = {
+  get: () => api.get('/notifications', getAuthConfig()),
+  update: (data) => api.put('/notifications', data, getAuthConfig())
+};
 
 export const api = {
-  // Auth
-  login: async (email, password) => {
-    const response = await fetch(`${API_BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    })
-    return handleResponse(response)
-  },
+  auth: authApi,
+  transactions: transactionsApi,
+  categories: categoriesApi,
+  reports: reportsApi,
+  budgets: budgetsApi,
+  profile: profileApi,
+  notifications: notificationsApi,
+  login: authApi.login,
+  register: authApi.register,
+  getTransactions: (params) => transactionsApi.getAll(params),
+  getTransaction: (id) => transactionsApi.get(id),
+  addTransaction: (data) => transactionsApi.create(data),
+  updateTransaction: (id, data) => transactionsApi.update(id, data),
+  deleteTransaction: (id) => transactionsApi.delete(id),
+  getCategories: () => categoriesApi.getAll(),
+  createCategory: (data) => categoriesApi.create(data),
+  seedCategories: () => categoriesApi.seed(),
+  deleteCategory: (id) => categoriesApi.delete(id),
+  getSummary: (period) => reportsApi.getSummary(period),
+  getSpendingByCategory: (period) => reportsApi.getSpending(period),
+  getMonthlyTrend: (months) => reportsApi.getTrend(months),
+  getBudgets: () => budgetsApi.getAll(),
+  createBudget: (data) => budgetsApi.create(data),
+  updateBudget: (id, data) => budgetsApi.update(id, data),
+  deleteBudget: (id) => budgetsApi.delete(id),
+  getProfile: () => profileApi.get(),
+  updateProfile: (data) => profileApi.update(data),
+  getNotificationSettings: () => notificationsApi.get(),
+  updateNotificationSettings: (data) => notificationsApi.update(data)
+};
 
-  register: async (name, email, password) => {
-    const response = await fetch(`${API_BASE}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
-    })
-    return handleResponse(response)
-  },
-
-  forgotPassword: async (email) => {
-    const response = await fetch(`${API_BASE}/auth/forgot-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    })
-    return handleResponse(response)
-  },
-
-resetPassword: async (token, newPassword) => {
-    const response = await fetch(`${API_BASE}/auth/reset-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, newPassword })
-    })
-    return handleResponse(response)
-  },
-
-  // Transactions
-  getTransactions: async (params = {}) => {
-    const query = new URLSearchParams(params).toString()
-    const url = `${API_BASE}/transactions${query ? `?${query}` : ''}`
-    const response = await fetch(url, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  getTransaction: async (id) => {
-    const response = await fetch(`${API_BASE}/transactions/${id}`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  addTransaction: async (data) => {
-    const response = await fetch(`${API_BASE}/transactions`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  updateTransaction: async (id, data) => {
-    const response = await fetch(`${API_BASE}/transactions/${id}`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  deleteTransaction: async (id) => {
-    const response = await fetch(`${API_BASE}/transactions/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    })
-    return handleResponse(response)
-  },
-
-  // Categories
-  getCategories: async () => {
-    const response = await fetch(`${API_BASE}/categories`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  createCategory: async (data) => {
-    const response = await fetch(`${API_BASE}/categories`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  seedCategories: async () => {
-    const response = await fetch(`${API_BASE}/categories/seed`, {
-      method: 'POST',
-      headers: getAuthHeaders()
-    })
-    return handleResponse(response)
-  },
-
-  deleteCategory: async (id) => {
-    const response = await fetch(`${API_BASE}/categories/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    })
-    return handleResponse(response)
-  },
-
-  // Reports
-  getSummary: async (period = 'month') => {
-    const response = await fetch(`${API_BASE}/reports/summary?period=${period}`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  getSpendingByCategory: async (period = 'month') => {
-    const response = await fetch(`${API_BASE}/reports/spending?period=${period}`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  getMonthlyTrend: async (months = 6) => {
-    const response = await fetch(`${API_BASE}/reports/trend?months=${months}`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  // Budgets
-  getBudgets: async () => {
-    const response = await fetch(`${API_BASE}/budgets`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  createBudget: async (data) => {
-    const response = await fetch(`${API_BASE}/budgets`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  updateBudget: async (id, data) => {
-    const response = await fetch(`${API_BASE}/budgets/${id}`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  deleteBudget: async (id) => {
-    const response = await fetch(`${API_BASE}/budgets/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    })
-    return handleResponse(response)
-  },
-
-  // Profile
-  getProfile: async () => {
-    const response = await fetch(`${API_BASE}/profile`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  updateProfile: async (data) => {
-    const response = await fetch(`${API_BASE}/profile`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  // Notifications
-  getNotificationSettings: async () => {
-    const response = await fetch(`${API_BASE}/notifications`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  updateNotificationSettings: async (data) => {
-    const response = await fetch(`${API_BASE}/notifications`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  }
-}
-
-export default api
+export default api;
