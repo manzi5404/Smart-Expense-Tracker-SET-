@@ -66,6 +66,16 @@ export function AuthProvider({ children }) {
     return updatedUserData
   }, [])
 
+  // Provide navigate function for components that need it
+  const logoutAndNavigate = useCallback((navigateFn) => {
+    localStorage.removeItem(TOKEN_KEY)
+    setToken(null)
+    setUser(null)
+    if (navigateFn) {
+      navigateFn('/')
+    }
+  }, [])
+
   const value = {
     user,
     token,
@@ -74,6 +84,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    logoutAndNavigate,
     updateProfile,
   }
 

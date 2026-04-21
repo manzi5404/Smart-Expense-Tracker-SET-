@@ -3,7 +3,25 @@ import Card from '../common/Card'
 import { formatCurrency } from '../../utils/formatters'
 
 function MonthlyTrend({ data }) {
-  const processedData = data.map(item => ({
+  const chartData = data && data.length > 0 ? data : []
+
+  if (chartData.length === 0) {
+    return (
+      <Card>
+        <Card.Header>
+          <Card.Title>Monthly Trend</Card.Title>
+          <Card.Description>Your financial journey over time</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <div className="h-72 flex items-center justify-center">
+            <p className="text-gray-500 dark:text-gray-400">No data available for this period</p>
+          </div>
+        </Card.Content>
+      </Card>
+    )
+  }
+
+  const processedData = chartData.map(item => ({
     ...item,
     balance: item.income - item.expenses
   }))
@@ -72,19 +90,19 @@ function MonthlyTrend({ data }) {
           <div className="text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">Avg Income</p>
             <p className="text-lg font-semibold text-green-600">
-              {formatCurrency(data.reduce((sum, d) => sum + d.income, 0) / data.length)}
+              {formatCurrency(chartData.length > 0 ? processedData.reduce((sum, d) => sum + (d.income || 0), 0) / processedData.length : 0)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">Avg Expenses</p>
             <p className="text-lg font-semibold text-red-600">
-              {formatCurrency(data.reduce((sum, d) => sum + d.expenses, 0) / data.length)}
+              {formatCurrency(chartData.length > 0 ? processedData.reduce((sum, d) => sum + (d.expenses || 0), 0) / processedData.length : 0)}
             </p>
           </div>
           <div className="text-center">
             <p className="text-sm text-gray-500 dark:text-gray-400">Avg Savings</p>
             <p className="text-lg font-semibold text-primary-600">
-              {formatCurrency(processedData.reduce((sum, d) => sum + d.balance, 0) / processedData.length)}
+              {formatCurrency(chartData.length > 0 ? processedData.reduce((sum, d) => sum + (d.balance || 0), 0) / processedData.length : 0)}
             </p>
           </div>
         </div>

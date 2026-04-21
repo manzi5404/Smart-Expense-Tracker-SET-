@@ -38,7 +38,7 @@ function Insights() {
             className={`${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Make Smarter{' '}
+              Make Smarter{' '}Financial Decisions
               <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
                 Financial Decisions
               </span>
@@ -93,12 +93,12 @@ function Insights() {
                 </div>
 
                 {/* Chart */}
-                <div className="h-48 flex items-end justify-between gap-2 mb-4">
+                <div className="h-48 min-h-[180px] flex items-end justify-between gap-1 mb-4">
                   {[65, 45, 80, 55, 70, 90, 75, 60, 85, 50, 95, 70].map((h, i) => (
                     <div
                       key={i}
-                      className="flex-1 bg-gradient-to-t from-primary-500 to-accent-500 rounded-t opacity-80 hover:opacity-100 transition-opacity"
-                      style={{ height: `${h}%` }}
+                      className="flex-1 min-w-[12px] bg-gradient-to-t from-primary-500 to-accent-500 rounded-t opacity-80 hover:opacity-100 transition-opacity"
+                      style={{ height: `${h}%`, minHeight: '8px' }}
                     />
                   ))}
                 </div>

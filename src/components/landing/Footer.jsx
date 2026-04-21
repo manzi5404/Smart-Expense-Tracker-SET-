@@ -1,19 +1,20 @@
+import { Link } from 'react-router-dom'
 import { Wallet } from 'lucide-react'
 
 const footerLinks = {
   Product: [
-    { label: 'Features', href: '#features' },
-    { label: 'Pricing', href: '#pricing' },
-    { label: 'Updates', href: '#updates' },
+    { label: 'Features', href: '#features', isAnchor: true },
+    { label: 'Pricing', href: '/pricing', isAnchor: false },
+    { label: 'Updates', href: '/updates', isAnchor: false },
   ],
   Company: [
-    { label: 'About', href: '#about' },
-    { label: 'Help Center', href: '#help' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'About', href: '/about', isAnchor: false },
+    { label: 'Help Center', href: '/help', isAnchor: false },
+    { label: 'Contact', href: '/contact', isAnchor: false },
   ],
   Legal: [
-    { label: 'Privacy Policy', href: '#privacy' },
-    { label: 'Terms of Service', href: '#terms' },
+    { label: 'Privacy Policy', href: '/privacy', isAnchor: false },
+    { label: 'Terms of Service', href: '/terms', isAnchor: false },
   ],
 }
 
@@ -45,12 +46,21 @@ function Footer() {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-gray-400 hover:text-primary-400 transition-colors text-sm"
-                    >
-                      {link.label}
-                    </a>
+                    {link.isAnchor ? (
+                      <a
+                        href={link.href}
+                        className="text-gray-400 hover:text-primary-400 transition-colors text-sm"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        to={link.href}
+                        className="text-gray-400 hover:text-primary-400 transition-colors text-sm"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -65,13 +75,13 @@ function Footer() {
               © {new Date().getFullYear()} ExpenseTracker. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
-              <a href="#terms" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Terms
-              </a>
+              </Link>
               <span className="text-gray-700">•</span>
-              <a href="#privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <Link to="/privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Privacy
-              </a>
+              </Link>
             </div>
           </div>
         </div>

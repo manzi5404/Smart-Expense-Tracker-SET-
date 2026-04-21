@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { Wallet, Sun, Moon, Menu, X, LayoutDashboard } from 'lucide-react'
 
-function Navbar({ onOpenAuth }) {
+function Navbar({ isAuthenticated }) {
   const { theme, toggleTheme } = useTheme()
-  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -32,7 +31,10 @@ function Navbar({ onOpenAuth }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div 
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => navigate('/')}
+          >
             <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
               <Wallet className="w-4 h-4 text-white" />
             </div>
@@ -43,6 +45,23 @@ function Navbar({ onOpenAuth }) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-4">
+            {!isAuthenticated && (
+              <>
+                <Link 
+                  to="/features"
+                  className="px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Features
+                </Link>
+                <Link 
+                  to="/pricing"
+                  className="px-3 py-2 text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Pricing
+                </Link>
+              </>
+            )}
+            
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -65,19 +84,19 @@ function Navbar({ onOpenAuth }) {
               </button>
             ) : (
               <>
-                <button
-                  onClick={() => onOpenAuth('login')}
+                <Link
+                  to="/login"
                   className="px-4 py-2 text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
                 >
                   Sign In
-                </button>
+                </Link>
 
-                <button
-                  onClick={() => onOpenAuth('register')}
+                <Link
+                  to="/register"
                   className="px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all shadow-md hover:shadow-lg"
                 >
                   Get Started
-                </button>
+                </Link>
               </>
             )}
           </div>
@@ -111,6 +130,25 @@ function Navbar({ onOpenAuth }) {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 mt-2 p-4 animate-fade-in">
             <div className="flex flex-col gap-3">
+              {!isAuthenticated && (
+                <>
+                  <Link 
+                    to="/features"
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-left"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Features
+                  </Link>
+                  <Link 
+                    to="/pricing"
+                    className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-left"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Pricing
+                  </Link>
+                </>
+              )}
+              
               {isAuthenticated ? (
                 <button
                   onClick={() => {
@@ -124,24 +162,20 @@ function Navbar({ onOpenAuth }) {
                 </button>
               ) : (
                 <>
-                  <button
-                    onClick={() => {
-                      onOpenAuth('login')
-                      setIsMobileMenuOpen(false)
-                    }}
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="w-full px-4 py-3 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-left"
                   >
                     Sign In
-                  </button>
-                  <button
-                    onClick={() => {
-                      onOpenAuth('register')
-                      setIsMobileMenuOpen(false)
-                    }}
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all"
                   >
                     Get Started
-                  </button>
+                  </Link>
                 </>
               )}
             </div>

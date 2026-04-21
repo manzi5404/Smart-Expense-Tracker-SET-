@@ -1,8 +1,10 @@
 import { ArrowRight, TrendingUp, PieChart, Target } from 'lucide-react'
 import { useScrollAnimation } from '../../hooks/useScrollAnimation'
+import { useNavigate } from 'react-router-dom'
 
-function Hero({ onOpenAuth }) {
+function Hero({ isAuthenticated }) {
   const { ref, isVisible } = useScrollAnimation()
+  const navigate = useNavigate()
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
@@ -26,7 +28,7 @@ function Hero({ onOpenAuth }) {
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
-              Take Control of Your{' '}
+              Take Control of Your Finances
               <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
                 Finances
               </span>
@@ -37,20 +39,32 @@ function Hero({ onOpenAuth }) {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                onClick={() => onOpenAuth('register')}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-accent-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-accent-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                >
+                  Track Your Expenses
+                  <ArrowRight className="w-5 h-5" />
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate('/register')}
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-accent-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                  >
+                    Get Started Free
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
 
-              <button
-                onClick={() => onOpenAuth('login')}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 transition-all"
-              >
-                Sign In
-              </button>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold rounded-xl border-2 border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 transition-all"
+                  >
+                    Sign In
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Trust Indicators */}
@@ -65,7 +79,7 @@ function Hero({ onOpenAuth }) {
                   ))}
                 </div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  1000+ users
+                  10+ users
                 </span>
               </div>
               <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
@@ -80,7 +94,7 @@ function Hero({ onOpenAuth }) {
                   </svg>
                 ))}
                 <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
-                  4.9 rating
+                  1.2 rating
                 </span>
               </div>
             </div>
@@ -124,12 +138,12 @@ function Hero({ onOpenAuth }) {
                   </div>
 
                   {/* Chart Placeholder */}
-                  <div className="h-32 bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-lg flex items-end justify-around px-4 py-2">
+                  <div className="h-32 min-h-[120px] bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-lg flex items-end justify-around px-4 py-2">
                     {[40, 65, 45, 80, 55, 70, 50].map((h, i) => (
                       <div
                         key={i}
-                        className="w-6 bg-gradient-to-t from-primary-500 to-accent-500 rounded-t"
-                        style={{ height: `${h}%` }}
+                        className="w-4 sm:w-6 bg-gradient-to-t from-primary-500 to-accent-500 rounded-t"
+                        style={{ height: `${h}%`, minHeight: '6px' }}
                       />
                     ))}
                   </div>

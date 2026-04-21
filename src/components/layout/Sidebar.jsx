@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -19,9 +19,13 @@ const navItems = [
 ]
 
 function Sidebar() {
+  const navigate = useNavigate()
   return (
     <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden lg:flex lg:flex-col">
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+      <div 
+        className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity"
+        onClick={() => navigate('/')}
+      >
         <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center">
           <Wallet className="w-5 h-5 text-white" />
         </div>

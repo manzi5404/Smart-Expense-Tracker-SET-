@@ -29,7 +29,7 @@ const pageTitles = {
 
 function Header() {
   const { theme, toggleTheme } = useTheme()
-  const { user, logout } = useAuth()
+  const { user, logoutAndNavigate } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -56,8 +56,7 @@ function Header() {
   }
 
   const confirmLogout = () => {
-    logout()
-    navigate('/')
+    logoutAndNavigate(navigate)
   }
 
   return (

@@ -15,6 +15,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import ResetPassword from './pages/ResetPassword'
 import ForgotPassword from './pages/ForgotPassword'
+import { Pricing, Updates, About, HelpCenter, Contact, Privacy, Terms } from './pages/StaticPages'
 
 function App() {
   return (
@@ -27,6 +28,15 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          
+          {/* Static pages */}
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/updates" element={<Updates />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/help" element={<HelpCenter />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
 
           {/* Protected routes */}
           <Route

@@ -3,6 +3,24 @@ import Card from '../common/Card'
 import { formatCurrency } from '../../utils/formatters'
 
 function IncomeVsExpense({ data }) {
+  const chartData = data && data.length > 0 ? data : []
+
+  if (chartData.length === 0) {
+    return (
+      <Card>
+        <Card.Header>
+          <Card.Title>Income vs Expenses</Card.Title>
+          <Card.Description>Monthly comparison</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <div className="h-64 flex items-center justify-center">
+            <p className="text-gray-500 dark:text-gray-400">No data available for this period</p>
+          </div>
+        </Card.Content>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <Card.Header>
@@ -12,7 +30,7 @@ function IncomeVsExpense({ data }) {
       <Card.Content>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.1} />
               <XAxis
                 dataKey="month"

@@ -1,4 +1,4 @@
-const { Transaction, Category } = require('../models');
+const { Transaction, Category, Budget } = require('../models');
 const { Op } = require('sequelize');
 const { successResponse, errorResponse } = require('../utils/response');
 
@@ -53,13 +53,55 @@ const getSummary = async (req, res) => {
       where: { ...where, type: 'expense' }
     }) || 0;
 
+    const budgets = await Budget.findAll({
+      where: { user_id: userId }
+    }) || [];
+
+    const allTransactions = await Transaction.findAll({
+      where,
+      order: [['date', 'DESC']],
+      raw: true
+    });
+
+    console.log('[DEBUG] getSummary - transactions count:', allTransactions.length);
+    if (allTransactions.length > 0) {
+      console.log('[DEBUG] Sample transaction:', allTransactions[0]);
+    }
+
+    const categoriesForUser = await Category.findAll({ where: { user_id: userId }, raw: true });
+    console.log('[DEBUG] getSummary - categories count:', categoriesForUser.length);
+    console.log('[DEBUG] getSummary - categories:', categoriesForUser.map(c => c.name));
+    
+    const catMapForSummary = {};
+    categoriesForUser.forEach(cat => {
+      catMapForSummary[cat.name] = cat;
+    });
+
+    const transactionsWithCategoryNames = allTransactions.map(tx => {
+      const cat = catMapForSummary[tx.category] || {};
+      return {
+        ...tx,
+        categoryName: cat.name || tx.category,
+        categoryColor: cat.color || '#6366f1'
+      };
+    });
+
     return successResponse(res, {
       totalIncome: parseFloat(totalIncome),
       totalExpenses: parseFloat(totalExpenses),
       balance: parseFloat(totalIncome) - parseFloat(totalExpenses),
       period,
       startDate,
-      endDate
+      endDate,
+      budgets: budgets.map(b => ({
+        id: b.id,
+        category: b.category,
+        limit: parseFloat(b.limit_amount),
+        spent: parseFloat(b.spent_amount),
+        period: b.period
+      })),
+      transactions: transactionsWithCategoryNames,
+      categories: categoriesForUser
     });
   } catch (error) {
     console.error('Get summary error:', error);
@@ -84,10 +126,11 @@ const getSpendingByCategory = async (req, res) => {
     const spending = await Transaction.findAll({
       attributes: [
         'category',
+        'type',
         [Transaction.sequelize.fn('SUM', Transaction.sequelize.col('amount')), 'total']
       ],
       where,
-      group: ['category'],
+      group: ['category', 'type'],
       raw: true
     });
 
@@ -95,24 +138,56 @@ const getSpendingByCategory = async (req, res) => {
       where: { user_id: userId },
       raw: true
     });
-    const categoryMap = {};
+    const categoryMapByName = {};
+    const categoryMapById = {};
     userCategories.forEach(cat => {
-      categoryMap[cat.id] = { name: cat.name, color: cat.color, icon: cat.icon };
+      categoryMapByName[cat.name] = { id: cat.id, name: cat.name, color: cat.color, icon: cat.icon };
+      categoryMapById[cat.id] = { id: cat.id, name: cat.name, color: cat.color, icon: cat.icon };
+    });
+
+    const allUserTransactions = await Transaction.findAll({
+      where: {
+        user_id: userId,
+        date: {
+          [Op.between]: [startDate, endDate]
+        }
+      },
+      order: [['date', 'DESC']],
+      raw: true
     });
 
     const defaultColors = ['#f59e0b', '#3b82f6', '#ec4899', '#ef4444', '#8b5cf6', '#10b981', '#06b6d4', '#0ea5e9'];
     
-    const formatted = spending.map((item, index) => {
-      const catInfo = categoryMap[item.category] || {};
-      return {
-        category: item.category,
-        name: catInfo.name || item.category,
+    const incomeByCategory = {};
+    const expenseByCategory = {};
+    
+    spending.forEach(item => {
+      console.log('[DEBUG] Spending item - category:', item.category, 'type:', item.type);
+      let catInfo = categoryMapByName[item.category] || categoryMapById[item.category];
+      if (!catInfo) {
+        console.log('[DEBUG] Category not found for:', item.category);
+        catInfo = { id: null, name: item.category, color: defaultColors[Object.keys(expenseByCategory).length % defaultColors.length] };
+      }
+      const formattedItem = {
+        category: catInfo.id || item.category,
+        name: catInfo.name,
         amount: parseFloat(item.total),
-        color: catInfo.color || defaultColors[index % defaultColors.length]
+        color: catInfo.color || defaultColors[Object.keys(expenseByCategory).length % defaultColors.length]
       };
+      
+      if (item.type === 'income') {
+        incomeByCategory[catInfo.name] = formattedItem;
+      } else {
+        expenseByCategory[catInfo.name] = formattedItem;
+      }
     });
 
-    return successResponse(res, formatted);
+    return successResponse(res, {
+      spendingByCategory: Object.values(expenseByCategory),
+      incomeByCategory: Object.values(incomeByCategory),
+      allTransactions: allUserTransactions,
+      categories: userCategories
+    });
   } catch (error) {
     console.error('Get spending by category error:', error);
     return errorResponse(res, 'Failed to get spending data', 500);

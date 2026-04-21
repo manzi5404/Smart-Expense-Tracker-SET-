@@ -52,7 +52,8 @@ function Reports() {
         setSummary(summaryData)
 
         const spending = extractData(spendingRes)
-        setSpendingData(spending.map(item => ({
+        const spendingArray = spending.spendingByCategory || spending.expenseByCategory || spending
+        setSpendingData(spendingArray.map(item => ({
           category: item.category,
           name: item.name || item.category,
           amount: item.amount,
