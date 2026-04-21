@@ -22,15 +22,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', resetPasswordRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/reports', reportRoutes);
-
-app.use('/api/auth', authRoutes);
-app.use('/api/auth', resetPasswordRoutes);
 
 
 app.get('/api/health', (req, res) => {
