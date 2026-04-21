@@ -6,6 +6,7 @@ const AppContext = createContext()
 
 const extractData = (response) => {
   if (!response) return null
+  console.log('[DEBUG] API Response:', JSON.stringify(response).substring(0, 200))
   if (response.data !== undefined) {
     const data = response.data
     if (Array.isArray(data)) return data
@@ -49,8 +50,10 @@ export function AppProvider({ children }) {
       const transactionsRes = await api.getTransactions()
       transactionsData = ensureArray(extractData(transactionsRes))
       setTransactions(transactionsData)
+      console.log('[✅] Transactions loaded:', transactionsData?.length || 0)
     } catch (err) {
-      console.error('Failed to load transactions:', err.message)
+      console.error('[❌] Failed to load transactions:', err.message)
+      setError('Failed to load transactions')
     }
     
     try {
@@ -61,13 +64,15 @@ export function AppProvider({ children }) {
         try {
           const seedRes = await api.seedCategories()
           categoriesData = ensureArray(extractData(seedRes))
+          console.log('[✅] Categories seeded')
         } catch (seedErr) {
-          console.log('Seed categories failed:', seedErr.message)
+          console.log('[❌] Seed categories failed:', seedErr.message)
         }
       }
       setCategories(ensureArray(categoriesData))
+      console.log('[✅] Categories loaded:', categoriesData?.length || 0)
     } catch (err) {
-      console.error('Failed to load categories:', err.message)
+      console.error('[❌] Failed to load categories:', err.message)
       if (categoriesData === null) {
         setCategories([])
       }
@@ -78,8 +83,9 @@ export function AppProvider({ children }) {
       const loadedBudgets = extractData(budgetsRes)
       budgetsData = ensureArray(loadedBudgets?.budgets || loadedBudgets)
       setBudgets(budgetsData)
+      console.log('[✅] Budgets loaded:', budgetsData?.length || 0)
     } catch (err) {
-      console.error('Failed to load budgets:', err.message)
+      console.error('[❌] Failed to load budgets:', err.message)
       if (budgetsData === null) {
         setBudgets([])
       }
@@ -141,9 +147,10 @@ export function AppProvider({ children }) {
     try {
       const newTransaction = await api.addTransaction(transaction)
       await refreshData()
+      console.log('[✅] Transaction added successfully')
       return extractData(newTransaction)
     } catch (err) {
-      console.error('Add transaction failed:', err)
+      console.error('[❌] Add transaction failed:', err)
       throw err
     }
   }, [refreshData])
@@ -152,8 +159,9 @@ export function AppProvider({ children }) {
     try {
       await api.updateTransaction(id, updates)
       await refreshData()
+      console.log('[✅] Transaction updated successfully')
     } catch (err) {
-      console.error('Update transaction failed:', err)
+      console.error('[❌] Update transaction failed:', err)
       throw err
     }
   }, [refreshData])
@@ -162,8 +170,9 @@ export function AppProvider({ children }) {
     try {
       await api.deleteTransaction(id)
       await refreshData()
+      console.log('[✅] Transaction deleted successfully')
     } catch (err) {
-      console.error('Delete transaction failed:', err)
+      console.error('[❌] Delete transaction failed:', err)
       throw err
     }
   }, [refreshData])
