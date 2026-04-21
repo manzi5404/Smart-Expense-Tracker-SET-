@@ -28,6 +28,11 @@ const getPeriodStart = (period) => {
   return startDate
 }
 
+const TYPE_COLORS = {
+  expense: '#ef4444',
+  income: '#10b981'
+}
+
 function Reports() {
   const { transactions, getCategoryName, getCategoryColor } = useApp()
   const [period, setPeriod] = useState('month')
@@ -36,7 +41,12 @@ function Reports() {
   const [summary, setSummary] = useState({ totalIncome: 0, totalExpenses: 0, balance: 0 })
   const [loadingReports, setLoadingReports] = useState(false)
 
-  const extractData = (res) => res?.data || res || []
+  const extractData = (res) => {
+    const data = res?.data
+    if (Array.isArray(data)) return data
+    if (data?.data && Array.isArray(data.data)) return data.data
+    return data || []
+  }
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -48,30 +58,32 @@ function Reports() {
           api.getMonthlyTrend(6)
         ])
 
-        const summaryData = extractData(summaryRes)
+        const summaryData = summaryRes?.data?.data || summaryRes?.data || summaryRes
         setSummary(summaryData)
 
-        const spending = extractData(spendingRes)
-        const spendingArray = spending.spendingByCategory || spending.expenseByCategory || spending
-        setSpendingData(spendingArray.map(item => ({
+        const spending = spendingRes?.data?.data || spendingRes?.data || spendingRes
+        const spendingArray = spending?.spendingByCategory || spending?.expenseByCategory || []
+        const safeSpending = Array.isArray(spendingArray) ? spendingArray : []
+        setSpendingData(safeSpending.map(item => ({
           category: item.category,
           name: item.name || item.category,
           amount: item.amount,
-          color: item.color || getCategoryColor(item.category)
+          color: item.color || getCategoryColor(item.category) || TYPE_COLORS.expense
         })))
 
-        const trend = extractData(trendRes)
-        const chartData = (trend.months || []).map((month, i) => ({
+        const trend = trendRes?.data?.data || trendRes?.data || trendRes
+        const chartData = (trend?.months || []).map((month, i) => ({
           month,
-          income: trend.income?.[i] || 0,
-          expenses: trend.expenses?.[i] || 0
+          income: trend?.income?.[i] || 0,
+          expenses: trend?.expenses?.[i] || 0
         }))
         setMonthlyChartData(chartData)
       } catch (err) {
         console.error('Failed to fetch reports:', err)
         const periodStart = getPeriodStart(period)
+        const safeTransactions = Array.isArray(transactions) ? transactions : []
         
-        const filteredTx = transactions.filter(t => {
+        const filteredTx = safeTransactions.filter(t => {
           const txDate = parseTransactionDate(t.date)
           return txDate >= periodStart
         })
@@ -85,7 +97,7 @@ function Reports() {
                 category: t.category,
                 name: getCategoryName(t.category),
                 amount: 0,
-                color: getCategoryColor(t.category)
+                color: getCategoryColor(t.category) || TYPE_COLORS.expense
               }
             }
             spendingByCat[t.category].amount += t.amount || 0
@@ -118,14 +130,16 @@ function Reports() {
 
   const periodTransactions = useMemo(() => {
     const periodStart = getPeriodStart(period)
-    return transactions.filter(t => {
+    const safeTransactions = Array.isArray(transactions) ? transactions : []
+    return safeTransactions.filter(t => {
       const txDate = parseTransactionDate(t.date)
       return txDate >= periodStart
     })
   }, [transactions, period])
 
-  const periodIncomeCount = periodTransactions.filter(t => t.type === 'income').length
-  const periodExpenseCount = periodTransactions.filter(t => t.type === 'expense').length
+  const safePeriodTransactions = Array.isArray(periodTransactions) ? periodTransactions : []
+  const periodIncomeCount = safePeriodTransactions.filter(t => t.type === 'income').length
+  const periodExpenseCount = safePeriodTransactions.filter(t => t.type === 'expense').length
 
   const stats = [
     {

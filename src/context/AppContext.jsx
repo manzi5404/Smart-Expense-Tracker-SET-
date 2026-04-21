@@ -132,26 +132,54 @@ export function AppProvider({ children }) {
     
     try {
       const transactionsRes = await api.getTransactions()
-      setTransactions(ensureArray(extractData(transactionsRes)))
+      const tx = extractArray(transactionsRes, 'transactions')
+      setTransactions(tx)
+      console.log('[REFRESH] Transactions:', tx.length)
     } catch (err) {
-      console.error('Failed to refresh transactions:', err.message)
+      console.error('[REFRESH ERROR] Transactions:', err.message)
     }
     
     try {
       const categoriesRes = await api.getCategories()
-      let categoriesData = extractData(categoriesRes) || []
+      let categoriesData = extractArray(categoriesRes, 'categories') || []
       
       if (!categoriesData || categoriesData.length === 0) {
         try {
           const seedRes = await api.seedCategories()
-          categoriesData = extractData(seedRes) || []
+          categoriesData = extractArray(seedRes, 'categories') || []
         } catch (seedErr) {
           console.log('Seed categories failed:', seedErr.message)
         }
       }
-      setCategories(categoriesData || [])
+      setCategories(categoriesData)
+      console.log('[REFRESH] Categories:', categoriesData.length)
     } catch (err) {
-      console.error('Failed to refresh categories:', err.message)
+      console.error('[REFRESH ERROR] Categories:', err.message)
+    }
+  }, [token])
+
+  const refreshAll = useCallback(async () => {
+    if (!token) return
+    console.log('[REFRESH ALL] Starting...')
+    
+    try {
+      const [transactionsRes, categoriesRes, budgetsRes] = await Promise.all([
+        api.getTransactions(),
+        api.getCategories(),
+        api.getBudgets()
+      ])
+      
+      const tx = extractArray(transactionsRes, 'transactions')
+      const cat = extractArray(categoriesRes, 'categories')
+      const bud = extractArray(budgetsRes, 'budgets')
+      
+      setTransactions(tx)
+      setCategories(cat)
+      setBudgets(bud)
+      
+      console.log('[REFRESH ALL] Done - Transactions:', tx.length, 'Categories:', cat.length, 'Budgets:', bud.length)
+    } catch (err) {
+      console.error('[REFRESH ALL ERROR]:', err.message)
     }
   }, [token])
 
@@ -160,39 +188,39 @@ export function AppProvider({ children }) {
     
     try {
       const categoriesRes = await api.getCategories()
-      setCategories(ensureArray(extractData(categoriesRes)))
+      setCategories(extractArray(categoriesRes, 'categories'))
     } catch (err) {
-      console.error('Failed to refresh categories:', err)
+      console.error('[REFRESH ERROR] Categories:', err)
     }
   }, [token])
 
   const addTransaction = useCallback(async (transaction) => {
     try {
       const newTransaction = await api.addTransaction(transaction)
-      await refreshData()
+      await refreshAll()
       console.log('[✅] Transaction added successfully')
-      return extractData(newTransaction)
+      return newTransaction?.data?.data || newTransaction?.data || newTransaction
     } catch (err) {
       console.error('[❌] Add transaction failed:', err)
       throw err
     }
-  }, [refreshData])
+  }, [refreshAll])
 
   const updateTransaction = useCallback(async (id, updates) => {
     try {
       await api.updateTransaction(id, updates)
-      await refreshData()
+      await refreshAll()
       console.log('[✅] Transaction updated successfully')
     } catch (err) {
       console.error('[❌] Update transaction failed:', err)
       throw err
     }
-  }, [refreshData])
+  }, [refreshAll])
 
   const deleteTransaction = useCallback(async (id) => {
     try {
       await api.deleteTransaction(id)
-      await refreshData()
+      await refreshAll()
       console.log('[✅] Transaction deleted successfully')
     } catch (err) {
       console.error('[❌] Delete transaction failed:', err)
@@ -203,23 +231,25 @@ export function AppProvider({ children }) {
   const addCategory = useCallback(async (categoryData) => {
     try {
       const newCategory = await api.createCategory(categoryData)
-      await refreshCategories()
-      return extractData(newCategory)
+      await refreshAll()
+      console.log('[✅] Category added')
+      return newCategory?.data?.data || newCategory?.data || newCategory
     } catch (err) {
-      console.error('Add category failed:', err)
+      console.error('[❌] Add category failed:', err)
       throw err
     }
-  }, [refreshCategories])
+  }, [refreshAll])
 
   const deleteCategory = useCallback(async (id) => {
     try {
       await api.deleteCategory(id)
-      await refreshCategories()
+      await refreshAll()
+      console.log('[✅] Category deleted')
     } catch (err) {
-      console.error('Delete category failed:', err)
+      console.error('[❌] Delete category failed:', err)
       throw err
     }
-  }, [refreshCategories])
+  }, [refreshAll])
 
   const refreshBudgets = useCallback(async () => {
     if (!token) return
@@ -321,6 +351,7 @@ export function AppProvider({ children }) {
     error,
     setIsLoading,
     refreshData,
+    refreshAll,
     refreshCategories,
     refreshBudgets,
     addTransaction,
