@@ -17,11 +17,14 @@ import {
 } from 'lucide-react'
 
 const pageTitles = {
-  '/': 'Dashboard',
+  '/dashboard': 'Dashboard',
   '/transactions': 'Transactions',
   '/add': 'Add Transaction',
   '/categories': 'Categories',
-  '/reports': 'Reports'
+  '/budgets': 'Budgets',
+  '/reports': 'Reports',
+  '/profile': 'Profile',
+  '/settings': 'Settings'
 }
 
 function Header() {
@@ -32,6 +35,7 @@ function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
   const userMenuRef = useRef(null)
 
   const pageTitle = pageTitles[location.pathname] || 'Dashboard'
@@ -48,8 +52,12 @@ function Header() {
   }, [])
 
   const handleLogout = () => {
+    setShowLogoutModal(true)
+  }
+
+  const confirmLogout = () => {
     logout()
-    navigate('/login')
+    navigate('/')
   }
 
   return (
@@ -143,7 +151,7 @@ function Header() {
                   <button
                     onClick={() => {
                       setUserMenuOpen(false)
-                      // Could navigate to settings page
+                      navigate('/profile')
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
@@ -153,7 +161,7 @@ function Header() {
                   <button
                     onClick={() => {
                       setUserMenuOpen(false)
-                      // Could navigate to settings page
+                      navigate('/settings')
                     }}
                     className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
@@ -219,6 +227,39 @@ function Header() {
               </button>
             ))}
           </nav>
+        </div>
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogOut className="w-6 h-6 text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                Sign Out
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Are you sure you want to sign out?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowLogoutModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Yes, Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </header>

@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
-import { Wallet, Sun, Moon, Menu, X } from 'lucide-react'
+import { Wallet, Sun, Moon, Menu, X, LayoutDashboard } from 'lucide-react'
 
 function Navbar({ onOpenAuth }) {
   const { theme, toggleTheme } = useTheme()
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
@@ -51,19 +55,31 @@ function Navbar({ onOpenAuth }) {
               )}
             </button>
 
-            <button
-              onClick={() => onOpenAuth('login')}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-            >
-              Sign In
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all shadow-md hover:shadow-lg"
+              >
+                <LayoutDashboard className="w-4 h-4" />
+                Go to Dashboard
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => onOpenAuth('login')}
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 font-medium hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                >
+                  Sign In
+                </button>
 
-            <button
-              onClick={() => onOpenAuth('register')}
-              className="px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all shadow-md hover:shadow-lg"
-            >
-              Get Started
-            </button>
+                <button
+                  onClick={() => onOpenAuth('register')}
+                  className="px-4 py-2 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all shadow-md hover:shadow-lg"
+                >
+                  Get Started
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -95,24 +111,39 @@ function Navbar({ onOpenAuth }) {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 mt-2 p-4 animate-fade-in">
             <div className="flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  onOpenAuth('login')
-                  setIsMobileMenuOpen(false)
-                }}
-                className="w-full px-4 py-3 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-left"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => {
-                  onOpenAuth('register')
-                  setIsMobileMenuOpen(false)
-                }}
-                className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all"
-              >
-                Get Started
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    navigate('/dashboard')
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Go to Dashboard
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => {
+                      onOpenAuth('login')
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="w-full px-4 py-3 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors text-left"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    onClick={() => {
+                      onOpenAuth('register')
+                      setIsMobileMenuOpen(false)
+                    }}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white font-medium rounded-lg hover:from-primary-600 hover:to-accent-600 transition-all"
+                  >
+                    Get Started
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}

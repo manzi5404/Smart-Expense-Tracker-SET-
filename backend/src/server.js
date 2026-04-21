@@ -11,8 +11,8 @@ const startServer = async () => {
 
     console.log('🚀 Server ready - Run `npm run db:reset` first to create tables');
     
-    app.listen(PORT, () => {
-      console.log(`\n🎉 Server running on http://localhost:${PORT}`);
+    app.listen(PORT, '127.0.0.1', () => {
+      console.log(`\n🎉 Server running on http://127.0.0.1:${PORT}`);
       console.log(`📋 API Docs: http://localhost:${PORT}/api/health`);
       console.log(`🔐 Auth: POST /api/auth/register & /api/auth/login`);
       console.log(`📊 Test: http://localhost:${PORT}/api/health`);

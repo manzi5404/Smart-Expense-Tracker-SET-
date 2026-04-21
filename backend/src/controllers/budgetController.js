@@ -7,6 +7,8 @@ const getBudgets = async (req, res) => {
     const userId = req.userId;
     const { period } = req.query;
 
+    console.log('[DEBUG] getBudgets - userId:', userId);
+
     const where = { user_id: userId };
     if (period) where.period = period;
 
@@ -15,11 +17,54 @@ const getBudgets = async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
-    return successResponse(res, { budgets });
+    const budgetsWithSpent = await Promise.all(budgets.map(async (budget) => {
+      const { startDate, endDate } = getPeriodDates(budget.period);
+      
+      const spent = await Transaction.sum('amount', {
+        where: {
+          user_id: userId,
+          type: 'expense',
+          category: budget.category,
+          date: {
+            [Op.gte]: startDate,
+            [Op.lte]: endDate
+          }
+        }
+      });
+
+      return {
+        ...budget.toJSON(),
+        spent_amount: spent || 0
+      };
+    }));
+
+    console.log('[DEBUG] getBudgets - found:', budgets.length);
+    return successResponse(res, { budgets: budgetsWithSpent });
   } catch (error) {
     console.error('Get budgets error:', error);
     return errorResponse(res, 'Failed to get budgets', 500);
   }
+};
+
+const getPeriodDates = (period) => {
+  const now = new Date();
+  let startDate, endDate;
+
+  if (period === 'weekly') {
+    const dayOfWeek = now.getDay();
+    startDate = new Date(now);
+    startDate.setDate(now.getDate() - dayOfWeek);
+    endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 6);
+  } else {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  }
+
+  return {
+    startDate: startDate.toISOString().split('T')[0],
+    endDate: endDate.toISOString().split('T')[0]
+  };
 };
 
 const createBudget = async (req, res) => {
@@ -43,11 +88,18 @@ const createBudget = async (req, res) => {
       return errorResponse(res, 'Budget for this category already exists', 400);
     }
 
+    const budgetPeriod = period || 'monthly';
+    const { startDate, endDate } = getPeriodDates(budgetPeriod);
+
     const expenses = await Transaction.sum('amount', {
       where: {
         user_id: userId,
         type: 'expense',
-        category
+        category,
+        date: {
+          [Op.gte]: startDate,
+          [Op.lte]: endDate
+        }
       }
     });
 
@@ -56,7 +108,7 @@ const createBudget = async (req, res) => {
       category,
       limit_amount,
       spent_amount: expenses || 0,
-      period: period || 'monthly'
+      period: budgetPeriod
     });
 
     return successResponse(res, budget, 'Budget created successfully', 201);

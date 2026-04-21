@@ -7,9 +7,14 @@ import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
 import AddTransaction from './pages/AddTransaction'
 import Categories from './pages/Categories'
+import Budgets from './pages/Budgets'
 import Reports from './pages/Reports'
+import Profile from './pages/Profile'
+import Settings from './pages/Settings'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import ResetPassword from './pages/ResetPassword'
+import ForgotPassword from './pages/ForgotPassword'
 
 function App() {
   return (
@@ -20,6 +25,8 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* Protected routes */}
           <Route
@@ -33,7 +40,10 @@ function App() {
             <Route path="/transactions" element={<Transactions />} />
             <Route path="/add" element={<AddTransaction />} />
             <Route path="/categories" element={<Categories />} />
+            <Route path="/budgets" element={<Budgets />} />
             <Route path="/reports" element={<Reports />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
           </Route>
 
           {/* Catch all - redirect to landing */}

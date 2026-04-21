@@ -5,7 +5,8 @@ import {
   PlusCircle,
   Tags,
   BarChart3,
-  Wallet
+  Wallet,
+  PiggyBank
 } from 'lucide-react'
 
 const navItems = [
@@ -13,6 +14,7 @@ const navItems = [
   { path: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { path: '/add', label: 'Add Transaction', icon: PlusCircle },
   { path: '/categories', label: 'Categories', icon: Tags },
+  { path: '/budgets', label: 'Budgets', icon: PiggyBank },
   { path: '/reports', label: 'Reports', icon: BarChart3 },
 ]
 

@@ -8,31 +8,50 @@ const handleResponse = async (response) => {
   return response.json()
 }
 
+// Get auth headers with token
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('token')
-  const headers = { 'Content-Type': 'application/json' }
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
-  return headers
-}
+  const token = localStorage.getItem('token');
+  return token ? {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  } : { 'Content-Type': 'application/json' };
+};
+
 
 export const api = {
   // Auth
   login: async (email, password) => {
     const response = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
-      headers: getAuthHeaders(),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     })
     return handleResponse(response)
   },
 
-register: async (name, email, password) => {
+  register: async (name, email, password) => {
     const response = await fetch(`${API_BASE}/auth/register`, {
       method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ name, email, password }) // Fixed: use 'password' not 'password_hash'
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    })
+    return handleResponse(response)
+  },
+
+  forgotPassword: async (email) => {
+    const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    })
+    return handleResponse(response)
+  },
+
+resetPassword: async (token, newPassword) => {
+    const response = await fetch(`${API_BASE}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword })
     })
     return handleResponse(response)
   },
@@ -164,6 +183,38 @@ register: async (name, email, password) => {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
+    })
+    return handleResponse(response)
+  },
+
+  // Budgets
+  getBudgets: async () => {
+    const response = await fetch(`${API_BASE}/budgets`, { headers: getAuthHeaders() })
+    return handleResponse(response)
+  },
+
+  createBudget: async (data) => {
+    const response = await fetch(`${API_BASE}/budgets`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    })
+    return handleResponse(response)
+  },
+
+  updateBudget: async (id, data) => {
+    const response = await fetch(`${API_BASE}/budgets/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    })
+    return handleResponse(response)
+  },
+
+  deleteBudget: async (id) => {
+    const response = await fetch(`${API_BASE}/budgets/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
     })
     return handleResponse(response)
   }

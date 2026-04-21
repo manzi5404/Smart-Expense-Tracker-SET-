@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import Modal from '../common/Modal'
 import Button from '../common/Button'
@@ -150,8 +150,25 @@ function AuthModals({ isOpen, mode, onClose, onSwitchMode }) {
             Sign In
           </Button>
 
-          <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-400">
+          <div className="flex items-center justify-between pt-4">
+            <label className="flex items-center gap-2 cursor-pointer text-xs">
+              <input
+                type="checkbox"
+                className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-gray-600 dark:text-gray-400">Remember me</span>
+            </label>
+            <Link 
+              to="/forgot-password" 
+              className="text-sm text-primary-600 dark:text-primary-400 hover:underline"
+              onClick={onClose}
+            >
+              Forgot password?
+            </Link>
+          </div>
+
+          <div className="text-center pt-2">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               Don't have an account?{' '}
               <button
                 type="button"
@@ -165,6 +182,7 @@ function AuthModals({ isOpen, mode, onClose, onSwitchMode }) {
               </button>
             </p>
           </div>
+
         </form>
       ) : (
         <form onSubmit={handleRegister} className="space-y-5">

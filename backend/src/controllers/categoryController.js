@@ -21,6 +21,8 @@ const getCategories = async (req, res) => {
     const userId = req.userId;
     const { type } = req.query;
 
+    console.log('[DEBUG] getCategories - userId:', userId);
+
     const where = { user_id: userId };
     if (type) {
       where.type = type;
@@ -31,6 +33,7 @@ const getCategories = async (req, res) => {
       order: [['name', 'ASC']]
     });
 
+    console.log('[DEBUG] getCategories - found:', categories.length);
     return successResponse(res, categories);
   } catch (error) {
     console.error('Get categories error:', error);

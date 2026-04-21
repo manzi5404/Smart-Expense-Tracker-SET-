@@ -135,9 +135,10 @@ function Login() {
                   />
                   <span className="text-sm text-gray-600 dark:text-gray-400">Remember me</span>
                 </label>
-                <button type="button" className="text-sm text-primary-600 dark:text-primary-400 hover:underline">
+                <Link to="/forgot-password" className="text-sm text-primary-600 dark:text-primary-400 hover:underline">
                   Forgot password?
-                </button>
+                </Link>
+
               </div>
 
               <Button

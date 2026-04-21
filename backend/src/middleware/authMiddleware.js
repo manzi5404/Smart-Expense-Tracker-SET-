@@ -6,6 +6,8 @@ const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
+    console.log('[DEBUG] Token received:', authHeader?.substring(0, 50));
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return errorResponse(res, 'No token provided', 401);
     }
@@ -13,6 +15,8 @@ const authMiddleware = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
 
     const decoded = verifyToken(token);
+
+    console.log('[DEBUG] Token decoded:', decoded);
 
     const user = await User.findByPk(decoded.userId);
 
@@ -22,6 +26,8 @@ const authMiddleware = async (req, res, next) => {
 
     req.user = user;
     req.userId = user.id;
+
+    console.log('[DEBUG] Auth middleware - userId:', user.id);
 
     next();
   } catch (error) {

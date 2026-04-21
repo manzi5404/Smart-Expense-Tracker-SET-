@@ -1,4 +1,4 @@
-import { Wallet, Heart } from 'lucide-react'
+import { Wallet } from 'lucide-react'
 
 const footerLinks = {
   Product: [
@@ -8,13 +8,12 @@ const footerLinks = {
   ],
   Company: [
     { label: 'About', href: '#about' },
-    { label: 'Blog', href: '#blog' },
-    { label: 'Careers', href: '#careers' },
-  ],
-  Support: [
     { label: 'Help Center', href: '#help' },
     { label: 'Contact', href: '#contact' },
-    { label: 'Privacy', href: '#privacy' },
+  ],
+  Legal: [
+    { label: 'Privacy Policy', href: '#privacy' },
+    { label: 'Terms of Service', href: '#terms' },
   ],
 }
 
@@ -35,9 +34,7 @@ function Footer() {
               Smart financial tracking for better money management.
             </p>
             <p className="text-gray-500 text-sm">
-              Made with{' '}
-              <Heart className="w-4 h-4 inline text-red-500 fill-current" />{' '}
-              in Rwanda
+              Made in Rwanda
             </p>
           </div>
 
@@ -74,10 +71,6 @@ function Footer() {
               <span className="text-gray-700">•</span>
               <a href="#privacy" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Privacy
-              </a>
-              <span className="text-gray-700">•</span>
-              <a href="#cookies" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Cookies
               </a>
             </div>
           </div>

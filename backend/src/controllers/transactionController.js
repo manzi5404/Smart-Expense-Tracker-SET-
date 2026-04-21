@@ -18,6 +18,8 @@ const getTransactions = async (req, res) => {
     const { startDate, endDate, category, type, page = 1, limit = 20 } = req.query;
     const userId = req.userId;
 
+    console.log('[DEBUG] getTransactions - userId:', userId);
+
     const where = { user_id: userId };
 
     if (startDate || endDate) {
@@ -35,6 +37,8 @@ const getTransactions = async (req, res) => {
       limit: parseInt(limit),
       offset: parseInt(offset)
     });
+
+    console.log('[DEBUG] getTransactions - found:', count);
 
     return successResponse(res, {
       transactions: formatTransactions(rows),

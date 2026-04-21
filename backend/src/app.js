@@ -8,6 +8,8 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const reportRoutes = require('./routes/reportRoutes');
+const resetPasswordRoutes = require('./routes/resetPasswordRoutes');
+
 
 const app = express();
 
@@ -26,6 +28,10 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/reports', reportRoutes);
+
+app.use('/api/auth', authRoutes);
+app.use('/api/auth', resetPasswordRoutes);
+
 
 app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Smart Expense Tracker API is running' });
