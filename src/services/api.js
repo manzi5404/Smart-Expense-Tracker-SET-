@@ -65,7 +65,30 @@ export const api = {
   notifications: {
     get: () => apiClient.get('/notifications', getAuthConfig()),
     update: (data) => apiClient.put('/notifications', data, getAuthConfig())
-  }
+  },
+
+  login: (email, password) => apiClient.post('/auth/login', { email, password }),
+  register: (name, email, password) => apiClient.post('/auth/register', { name, email, password }),
+  getProfile: () => apiClient.get('/profile', getAuthConfig()),
+  updateProfile: (data) => apiClient.put('/profile', data, getAuthConfig()),
+  getTransactions: (params) => apiClient.get('/transactions', { params, ...getAuthConfig() }),
+  getTransaction: (id) => apiClient.get(`/transactions/${id}`, getAuthConfig()),
+  addTransaction: (data) => apiClient.post('/transactions', data, getAuthConfig()),
+  updateTransaction: (id, data) => apiClient.put(`/transactions/${id}`, data, getAuthConfig()),
+  deleteTransaction: (id) => apiClient.delete(`/transactions/${id}`, getAuthConfig()),
+  getCategories: () => apiClient.get('/categories', getAuthConfig()),
+  createCategory: (data) => apiClient.post('/categories', data, getAuthConfig()),
+  seedCategories: () => apiClient.post('/categories/seed', {}, getAuthConfig()),
+  deleteCategory: (id) => apiClient.delete(`/categories/${id}`, getAuthConfig()),
+  getSummary: (period) => apiClient.get(`/reports/summary?period=${period}`, getAuthConfig()),
+  getSpendingByCategory: (period) => apiClient.get(`/reports/spending?period=${period}`, getAuthConfig()),
+  getMonthlyTrend: (months) => apiClient.get(`/reports/trend?months=${months}`, getAuthConfig()),
+  getBudgets: () => apiClient.get('/budgets', getAuthConfig()),
+  createBudget: (data) => apiClient.post('/budgets', data, getAuthConfig()),
+  updateBudget: (id, data) => apiClient.put(`/budgets/${id}`, data, getAuthConfig()),
+  deleteBudget: (id) => apiClient.delete(`/budgets/${id}`, getAuthConfig()),
+  getNotificationSettings: () => apiClient.get('/notifications', getAuthConfig()),
+  updateNotificationSettings: (data) => apiClient.put('/notifications', data, getAuthConfig())
 };
 
 export default api;
