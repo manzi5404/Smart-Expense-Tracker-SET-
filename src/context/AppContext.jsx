@@ -28,40 +28,54 @@ export function AppProvider({ children }) {
       return
     }
     
+    setIsLoading(true)
+    setError(null)
+    
+    let transactionsData = null
+    let categoriesData = null
+    let budgetsData = null
+    
     try {
-      setIsLoading(true)
-      setError(null)
+      const transactionsRes = await api.getTransactions()
+      transactionsData = extractData(transactionsRes)
+      setTransactions(transactionsData || [])
+    } catch (err) {
+      console.error('Failed to load transactions:', err.message)
+    }
+    
+    try {
+      let categoriesRes = await api.getCategories()
+      categoriesData = extractData(categoriesRes) || []
       
-      const [transactionsRes, categoriesRes, budgetsRes] = await Promise.all([
-        api.getTransactions(),
-        api.getCategories(),
-        api.getBudgets()
-      ])
-      
-      let loadedCategories = extractData(categoriesRes) || []
-      
-      if (!loadedCategories || loadedCategories.length === 0) {
+      if (!categoriesData || categoriesData.length === 0) {
         try {
           const seedRes = await api.seedCategories()
-          loadedCategories = extractData(seedRes) || []
+          categoriesData = extractData(seedRes) || []
         } catch (seedErr) {
           console.log('Seed categories failed:', seedErr.message)
         }
       }
-      
-      const loadedBudgets = extractData(budgetsRes)
-      setTransactions(extractData(transactionsRes) || [])
-      setCategories(loadedCategories || [])
-      setBudgets(loadedBudgets?.budgets || loadedBudgets || [])
+      setCategories(categoriesData || [])
     } catch (err) {
-      console.error('Failed to load data:', err)
-      setError(err.message)
-      setTransactions([])
-      setCategories([])
-      setBudgets([])
-    } finally {
-      setIsLoading(false)
+      console.error('Failed to load categories:', err.message)
+      if (categoriesData === null) {
+        setCategories([])
+      }
     }
+    
+    try {
+      const budgetsRes = await api.getBudgets()
+      const loadedBudgets = extractData(budgetsRes)
+      budgetsData = loadedBudgets?.budgets || loadedBudgets || []
+      setBudgets(budgetsData || [])
+    } catch (err) {
+      console.error('Failed to load budgets:', err.message)
+      if (budgetsData === null) {
+        setBudgets([])
+      }
+    }
+    
+    setIsLoading(false)
   }, [token])
 
   useEffect(() => {
@@ -78,18 +92,27 @@ export function AppProvider({ children }) {
     if (!token) return
     
     try {
-      setIsLoading(true)
-      const [transactionsRes, categoriesRes] = await Promise.all([
-        api.getTransactions(),
-        api.getCategories()
-      ])
-      
+      const transactionsRes = await api.getTransactions()
       setTransactions(extractData(transactionsRes) || [])
-      setCategories(extractData(categoriesRes) || [])
     } catch (err) {
-      console.error('Failed to refresh:', err)
-    } finally {
-      setIsLoading(false)
+      console.error('Failed to refresh transactions:', err.message)
+    }
+    
+    try {
+      const categoriesRes = await api.getCategories()
+      let categoriesData = extractData(categoriesRes) || []
+      
+      if (!categoriesData || categoriesData.length === 0) {
+        try {
+          const seedRes = await api.seedCategories()
+          categoriesData = extractData(seedRes) || []
+        } catch (seedErr) {
+          console.log('Seed categories failed:', seedErr.message)
+        }
+      }
+      setCategories(categoriesData || [])
+    } catch (err) {
+      console.error('Failed to refresh categories:', err.message)
     }
   }, [token])
 

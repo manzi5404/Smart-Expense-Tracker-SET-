@@ -34,54 +34,54 @@ function TransactionList({ transactions, categories }) {
             className="overflow-hidden"
           >
             <div
-              className="p-4 flex items-center justify-between cursor-pointer"
+              className="p-3 sm:p-4 flex items-center justify-between gap-2 cursor-pointer"
               onClick={() => setExpandedId(isExpanded ? null : transaction.id)}
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                 <div
-                  className={`p-3 rounded-xl ${
+                  className={`p-2 sm:p-3 rounded-xl flex-shrink-0 ${
                     isIncome
                       ? 'bg-green-100 dark:bg-green-900/30'
                       : 'bg-red-100 dark:bg-red-900/30'
                   }`}
                 >
                   {isIncome ? (
-                    <ArrowUpRight className="w-5 h-5 text-green-600 dark:text-green-400" />
+                    <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" />
                   ) : (
-                    <ArrowDownRight className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <ArrowDownRight className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 dark:text-red-400" />
                   )}
                 </div>
 
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900 dark:text-white truncate text-sm sm:text-base">
                     {getCategoryName(transaction.category, categories)}
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(transaction.date)}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">
                 <div className="text-right">
-                  <p className={`font-semibold ${isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                  <p className={`text-sm sm:text-base font-semibold truncate max-w-[100px] sm:max-w-none ${isIncome ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                     {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
                   </p>
                 </div>
                 {isExpanded ? (
-                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                  <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
                 )}
               </div>
             </div>
 
             {isExpanded && (
-              <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="px-3 sm:px-4 pb-3 sm:pb-4 pt-2 border-t border-gray-100 dark:border-gray-700">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                   <div>
                     <p className="text-gray-500 dark:text-gray-400">Description</p>
-                    <p className="text-gray-900 dark:text-white mt-1">
+                    <p className="text-gray-900 dark:text-white mt-1 truncate">
                       {transaction.description || 'No description'}
                     </p>
                   </div>
@@ -89,10 +89,10 @@ function TransactionList({ transactions, categories }) {
                     <p className="text-gray-500 dark:text-gray-400">Category</p>
                     <div className="flex items-center gap-2 mt-1">
                       <div
-                        className="w-3 h-3 rounded-full"
+                        className="w-3 h-3 rounded-full flex-shrink-0"
                         style={{ backgroundColor: getCategoryColor(transaction.category, categories) }}
                       />
-                      <span className="text-gray-900 dark:text-white">
+                      <span className="text-gray-900 dark:text-white truncate">
                         {getCategoryName(transaction.category, categories)}
                       </span>
                     </div>

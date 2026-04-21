@@ -112,8 +112,8 @@ function Categories() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Categories</h1>
           <p className="text-gray-500 dark:text-gray-400">Manage your income and expense categories</p>
@@ -121,6 +121,7 @@ function Categories() {
         <Button
           onClick={() => setShowModal(true)}
           icon={<Plus className="w-4 h-4" />}
+          className="w-full sm:w-auto min-w-fit"
         >
           New Category
         </Button>
@@ -279,12 +280,12 @@ function Categories() {
             <p className="text-sm text-red-500">{error}</p>
           )}
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <Button
               type="button"
               variant="secondary"
               onClick={() => setShowModal(false)}
-              className="flex-1"
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -293,7 +294,7 @@ function Categories() {
               onClick={handleCreateCategory}
               disabled={isCreating}
               icon={<Plus className="w-4 h-4" />}
-              className="flex-1"
+              className="w-full sm:w-auto"
             >
               {isCreating ? 'Creating...' : 'Create'}
             </Button>

@@ -157,6 +157,23 @@ resetPassword: async (token, newPassword) => {
     return handleResponse(response)
   },
 
+  updateBudget: async (id, data) => {
+    const response = await fetch(`${API_BASE}/budgets/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    })
+    return handleResponse(response)
+  },
+
+  deleteBudget: async (id) => {
+    const response = await fetch(`${API_BASE}/budgets/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    })
+    return handleResponse(response)
+  },
+
   // Profile
   getProfile: async () => {
     const response = await fetch(`${API_BASE}/profile`, { headers: getAuthHeaders() })
@@ -183,38 +200,6 @@ resetPassword: async (token, newPassword) => {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  // Budgets
-  getBudgets: async () => {
-    const response = await fetch(`${API_BASE}/budgets`, { headers: getAuthHeaders() })
-    return handleResponse(response)
-  },
-
-  createBudget: async (data) => {
-    const response = await fetch(`${API_BASE}/budgets`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  updateBudget: async (id, data) => {
-    const response = await fetch(`${API_BASE}/budgets/${id}`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    })
-    return handleResponse(response)
-  },
-
-  deleteBudget: async (id) => {
-    const response = await fetch(`${API_BASE}/budgets/${id}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
     })
     return handleResponse(response)
   }

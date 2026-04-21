@@ -12,7 +12,6 @@ import {
   X,
   User,
   LogOut,
-  Settings,
   ChevronDown
 } from 'lucide-react'
 
@@ -59,8 +58,19 @@ function Header() {
     logoutAndNavigate(navigate)
   }
 
+  const navItems = [
+    { path: '/', label: 'Home', isExternal: true },
+    { path: '/dashboard', label: 'Dashboard' },
+    { path: '/transactions', label: 'Transactions' },
+    { path: '/categories', label: 'Categories' },
+    { path: '/budgets', label: 'Budgets' },
+    { path: '/reports', label: 'Reports' },
+    { path: '/profile', label: 'Profile' },
+    { path: '/settings', label: 'Settings' },
+  ]
+
   return (
-    <header className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <header className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700" style={{ overflow: 'visible' }}>
       <div className="flex items-center justify-between px-4 lg:px-6 py-4">
         <div className="flex items-center gap-4">
           <button
@@ -79,7 +89,7 @@ function Header() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <button
             onClick={() => setSearchOpen(!searchOpen)}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -102,11 +112,13 @@ function Header() {
             <Plus className="w-5 h-5" />
           </button>
 
-          <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          {/* Notifications - always visible on mobile */}
+          <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <Bell className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           </button>
 
+          {/* Theme toggle - always visible */}
           <button
             onClick={toggleTheme}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -118,8 +130,8 @@ function Header() {
             )}
           </button>
 
-          {/* User Menu */}
-          <div className="relative" ref={userMenuRef}>
+          {/* User Menu - Desktop only */}
+          <div className="hidden lg:block relative header-user-menu" ref={userMenuRef}>
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -129,14 +141,11 @@ function Header() {
                   {user?.name?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
-              <span className="hidden md:block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {user?.name?.split(' ')[0] || 'User'}
-              </span>
               <ChevronDown className="w-4 h-4 text-gray-400" />
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-[100] dropdown-menu">
                 <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {user?.name}
@@ -156,16 +165,6 @@ function Header() {
                   >
                     <User className="w-4 h-4" />
                     Profile
-                  </button>
-                  <button
-                    onClick={() => {
-                      setUserMenuOpen(false)
-                      navigate('/settings')
-                    }}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Settings
                   </button>
                 </div>
 
@@ -205,27 +204,49 @@ function Header() {
         </div>
       )}
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu (Hamburger Menu) */}
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          <nav className="p-4 space-y-2">
-            {Object.entries(pageTitles).map(([path, label]) => (
-              <button
-                key={path}
-                onClick={() => {
-                  navigate(path)
-                  setMobileMenuOpen(false)
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg ${
-                  location.pathname === path
-                    ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <nav className="p-4 space-y-1">
+            {navItems.map((item) => {
+              const isActive = item.isExternal ? false : location.pathname === item.path
+              const isHome = item.path === '/'
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => {
+                    if (item.isExternal) {
+                      navigate('/')
+                    } else {
+                      navigate(item.path)
+                    }
+                    setMobileMenuOpen(false)
+                  }}
+                  className={`w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 ${
+                    isActive || (isHome && location.pathname === '/')
+                      ? 'bg-primary-50 text-primary-600 dark:bg-primary-900/30'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              )
+            })}
           </nav>
+          
+          {/* Sign Out - Bottom of mobile menu */}
+          <div className="p-4 pt-0">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false)
+                handleLogout()
+              }}
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 border-t border-gray-200 dark:border-gray-700"
+            >
+              <LogOut className="w-5 h-5" />
+              Sign Out
+            </button>
+          </div>
         </div>
       )}
 

@@ -125,9 +125,9 @@ function Settings() {
         </h2>
         
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700">
-          <div className="p-4 flex items-center justify-between">
+          <div className="settings-toggle-row">
             <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-gray-400" />
+              <Mail className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <div>
                 <p className="text-gray-900 dark:text-white font-medium">Email Notifications</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Receive updates via email</p>
@@ -135,21 +135,21 @@ function Settings() {
             </div>
             <button
               onClick={() => handleToggle('notifications', 'emailNotifications')}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              className={`settings-toggle-btn ${
                 notifications.emailNotifications ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                className={`settings-toggle-knob ${
                   notifications.emailNotifications ? 'translate-x-7' : 'translate-x-1'
                 }`}
               />
             </button>
           </div>
 
-          <div className="p-4 flex items-center justify-between">
+          <div className="settings-toggle-row">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-5 h-5 text-gray-400" />
+              <AlertTriangle className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <div>
                 <p className="text-gray-900 dark:text-white font-medium">Budget Alerts</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when approaching budget limit</p>
@@ -157,21 +157,21 @@ function Settings() {
             </div>
             <button
               onClick={() => handleToggle('notifications', 'budgetAlerts')}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              className={`settings-toggle-btn ${
                 notifications.budgetAlerts ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                className={`settings-toggle-knob ${
                   notifications.budgetAlerts ? 'translate-x-7' : 'translate-x-1'
                 }`}
               />
             </button>
           </div>
 
-          <div className="p-4 flex items-center justify-between">
+          <div className="settings-toggle-row">
             <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5 text-gray-400" />
+              <FileText className="w-5 h-5 text-gray-400 flex-shrink-0" />
               <div>
                 <p className="text-gray-900 dark:text-white font-medium">Weekly Summary</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Receive weekly spending summary</p>
@@ -179,12 +179,12 @@ function Settings() {
             </div>
             <button
               onClick={() => handleToggle('notifications', 'weeklySummary')}
-              className={`relative w-12 h-6 rounded-full transition-colors ${
+              className={`settings-toggle-btn ${
                 notifications.weeklySummary ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
               }`}
             >
               <span
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                className={`settings-toggle-knob ${
                   notifications.weeklySummary ? 'translate-x-7' : 'translate-x-1'
                 }`}
               />

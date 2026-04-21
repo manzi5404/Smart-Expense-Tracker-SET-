@@ -11,7 +11,7 @@ function Landing() {
   const { isAuthenticated, isLoading } = useAuth()
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900 prevent-overflow">
       <Navbar isAuthenticated={isAuthenticated} />
       <main>
         <Hero isAuthenticated={isAuthenticated} />

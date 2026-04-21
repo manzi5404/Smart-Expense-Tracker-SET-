@@ -86,22 +86,22 @@ function MonthlyTrend({ data }) {
           </ResponsiveContainer>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Avg Income</p>
-            <p className="text-lg font-semibold text-green-600">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Avg Income</p>
+            <p className="text-sm sm:text-lg font-semibold text-green-600 truncate">
               {formatCurrency(chartData.length > 0 ? processedData.reduce((sum, d) => sum + (d.income || 0), 0) / processedData.length : 0)}
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Avg Expenses</p>
-            <p className="text-lg font-semibold text-red-600">
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Avg Expenses</p>
+            <p className="text-sm sm:text-lg font-semibold text-red-600 truncate">
               {formatCurrency(chartData.length > 0 ? processedData.reduce((sum, d) => sum + (d.expenses || 0), 0) / processedData.length : 0)}
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-sm text-gray-500 dark:text-gray-400">Avg Savings</p>
-            <p className="text-lg font-semibold text-primary-600">
+          <div className="text-center p-3 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Avg Savings</p>
+            <p className="text-sm sm:text-lg font-semibold text-primary-600 truncate">
               {formatCurrency(chartData.length > 0 ? processedData.reduce((sum, d) => sum + (d.balance || 0), 0) / processedData.length : 0)}
             </p>
           </div>

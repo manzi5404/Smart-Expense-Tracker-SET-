@@ -156,14 +156,14 @@ function Reports() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Reports</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {['week', 'month', 'year'].map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors capitalize ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors capitalize text-sm sm:text-base ${
                 period === p
                   ? 'bg-primary-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300'
@@ -175,17 +175,17 @@ function Reports() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <Card key={index} className="flex items-center gap-4">
-              <div className={`p-3 rounded-xl ${stat.color}`}>
-                <Icon className="w-5 h-5" />
+            <Card key={index} className="flex items-start gap-3">
+              <div className={`p-2 sm:p-3 rounded-xl flex-shrink-0 ${stat.color}`}>
+                <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{stat.label}</p>
+                <p className="text-base sm:text-xl font-bold text-gray-900 dark:text-white truncate">{stat.value}</p>
               </div>
             </Card>
           )

@@ -127,20 +127,20 @@ function Login() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 flex items-center justify-center p-6 lg:p-12">
+        <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-12">
           <div className="w-full max-w-md animate-fade-in-up">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
                 Welcome back
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                 Sign in to continue managing your finances
               </p>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8 animate-scale-in">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 sm:p-8 animate-scale-in">
               {error && (
-                <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-center gap-3 text-red-600 dark:text-red-400 animate-shake">
+                <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3 text-red-600 dark:text-red-400 animate-shake">
                   <AlertCircle className="w-5 h-5 flex-shrink-0" />
                   <span className="text-sm">{error}</span>
                 </div>

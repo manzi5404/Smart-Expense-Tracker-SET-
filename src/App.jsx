@@ -21,6 +21,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 prevent-overflow" style={{ overflowX: 'visible', maxWidth: 'none' }}>
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Landing />} />
@@ -59,6 +60,7 @@ function App() {
           {/* Catch all - redirect to landing */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </div>
       </AuthProvider>
     </BrowserRouter>
   )
