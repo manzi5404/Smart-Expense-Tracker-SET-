@@ -17,18 +17,27 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
   response => response,
   error => {
+    console.error('[API ERROR]', error.response?.status, error.response?.data);
     const message = error.response?.data?.message || error.message || 'Network error';
     return Promise.reject(new Error(message));
   }
 );
 
-apiClient.interceptors.request.use(config => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+apiClient.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.warn('[API] No token found in localStorage');
+    }
+    return config;
+  },
+  error => {
+    console.error('[API REQUEST ERROR]', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
 
 export const api = {
   auth: {
