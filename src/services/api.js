@@ -78,7 +78,32 @@ register: async (name, email, password) => {
 
   // Categories
   getCategories: async () => {
-    const response = await fetch(`${API_BASE}/categories`)
+    const response = await fetch(`${API_BASE}/categories`, { headers: getAuthHeaders() })
+    return handleResponse(response)
+  },
+
+  createCategory: async (data) => {
+    const response = await fetch(`${API_BASE}/categories`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    })
+    return handleResponse(response)
+  },
+
+  seedCategories: async () => {
+    const response = await fetch(`${API_BASE}/categories/seed`, {
+      method: 'POST',
+      headers: getAuthHeaders()
+    })
+    return handleResponse(response)
+  },
+
+  deleteCategory: async (id) => {
+    const response = await fetch(`${API_BASE}/categories/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    })
     return handleResponse(response)
   },
 

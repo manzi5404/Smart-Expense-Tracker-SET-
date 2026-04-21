@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useApp } from '../context/AppContext'
 
 export function useCategories() {
-  const { categories, transactions } = useApp()
+  const { categories, transactions, getCategoryName, getCategoryColor } = useApp()
 
   const incomeCategories = useMemo(() =>
     categories.filter(c => c.type === 'income'),
@@ -21,6 +21,8 @@ export function useCategories() {
       stats[cat.id] = {
         count: categoryTransactions.length,
         total: categoryTransactions.reduce((sum, t) => sum + t.amount, 0),
+        name: cat.name,
+        color: cat.color
       }
     })
     return stats
@@ -36,5 +38,7 @@ export function useCategories() {
     expenseCategories,
     categoryStats,
     getCategoryStats,
+    getCategoryName,
+    getCategoryColor
   }
 }

@@ -4,12 +4,16 @@ import { useApp } from '../../context/AppContext'
 import { formatCurrency } from '../../utils/formatters'
 import Button from '../common/Button'
 import Card from '../common/Card'
-import { ArrowUpRight, ArrowDownRight, Save } from 'lucide-react'
+import Modal from '../common/Modal'
+import { ArrowUpRight, ArrowDownRight, Save, Plus } from 'lucide-react'
+
+const CATEGORY_COLORS = ['#f59e0b', '#3b82f6', '#ec4899', '#ef4444', '#8b5cf6', '#10b981', '#06b6d4', '#0ea5e9', '#84cc16', '#f97316']
+const CATEGORY_ICONS = ['Tag', 'Briefcase', 'Laptop', 'TrendingUp', 'Plus', 'Utensils', 'Car', 'ShoppingBag', 'Receipt', 'Film', 'Heart', 'Book', 'MoreHorizontal', 'Home', 'Gift', 'Coffee', 'Plane', 'Smartphone', 'Wifi', 'Zap']
 
 function TransactionForm() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { addTransaction, updateTransaction, categories } = useApp()
+  const { addTransaction, updateTransaction, categories, addCategory } = useApp()
 
   const editTransaction = location.state?.editTransaction
   const initialType = location.state?.type || 'expense'
@@ -23,6 +27,12 @@ function TransactionForm() {
   })
 
   const [errors, setErrors] = useState({})
+  const [showCategoryModal, setShowCategoryModal] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState('')
+  const [newCategoryColor, setNewCategoryColor] = useState(CATEGORY_COLORS[0])
+  const [newCategoryIcon, setNewCategoryIcon] = useState(CATEGORY_ICONS[0])
+  const [creatingCategory, setCreatingCategory] = useState(false)
+  const [categoryError, setCategoryError] = useState('')
 
   useEffect(() => {
     if (editTransaction) {
@@ -86,6 +96,34 @@ function TransactionForm() {
     }
   }
 
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) {
+      setCategoryError('Category name is required')
+      return
+    }
+
+    setCreatingCategory(true)
+    setCategoryError('')
+
+    try {
+      const newCategory = await addCategory({
+        name: newCategoryName.trim(),
+        type: formData.type,
+        color: newCategoryColor,
+        icon: newCategoryIcon
+      })
+      
+      const categoryId = newCategory?.id || newCategory?.data?.id
+      setFormData(prev => ({ ...prev, category: categoryId }))
+      setShowCategoryModal(false)
+      setNewCategoryName('')
+    } catch (err) {
+      setCategoryError(err.message || 'Failed to create category')
+    } finally {
+      setCreatingCategory(false)
+    }
+  }
+
   return (
     <Card className="max-w-2xl mx-auto">
       <Card.Header>
@@ -101,7 +139,6 @@ function TransactionForm() {
 
       <Card.Content>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Type Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Transaction Type
@@ -138,7 +175,6 @@ function TransactionForm() {
             </div>
           </div>
 
-          {/* Amount */}
           <div>
             <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Amount (FRW)
@@ -165,11 +201,20 @@ function TransactionForm() {
             )}
           </div>
 
-          {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Category
-            </label>
+            <div className="flex items-center justify-between mb-2">
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Category
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowCategoryModal(true)}
+                className="text-xs text-primary-600 hover:text-primary-700 flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                Create New
+              </button>
+            </div>
             <select
               id="category"
               value={formData.category}
@@ -188,9 +233,20 @@ function TransactionForm() {
             {errors.category && (
               <p className="mt-1 text-sm text-red-500">{errors.category}</p>
             )}
+            {filteredCategories.length === 0 && (
+              <p className="mt-1 text-sm text-gray-500">
+                No {formData.type} categories yet.{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowCategoryModal(true)}
+                  className="text-primary-600 hover:text-primary-700"
+                >
+                  Create one now
+                </button>
+              </p>
+            )}
           </div>
 
-          {/* Date */}
           <div>
             <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Date
@@ -209,7 +265,6 @@ function TransactionForm() {
             )}
           </div>
 
-          {/* Description */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Description <span className="text-gray-400">(optional)</span>
@@ -224,7 +279,6 @@ function TransactionForm() {
             />
           </div>
 
-          {/* Actions */}
           <div className="flex gap-4 pt-4">
             <Button
               type="button"
@@ -244,6 +298,66 @@ function TransactionForm() {
           </div>
         </form>
       </Card.Content>
+
+      <Modal isOpen={showCategoryModal} onClose={() => setShowCategoryModal(false)} title="Create New Category">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Category Name
+            </label>
+            <input
+              type="text"
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              placeholder="e.g., Groceries"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Color
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORY_COLORS.map(color => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => setNewCategoryColor(color)}
+                  className={`w-8 h-8 rounded-full transition-transform ${
+                    newCategoryColor === color ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : ''
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {categoryError && (
+            <p className="text-sm text-red-500">{categoryError}</p>
+          )}
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowCategoryModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleCreateCategory}
+              disabled={creatingCategory}
+              icon={<Plus className="w-4 h-4" />}
+              className="flex-1"
+            >
+              {creatingCategory ? 'Creating...' : 'Create Category'}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </Card>
   )
 }

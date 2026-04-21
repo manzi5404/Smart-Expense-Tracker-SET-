@@ -5,6 +5,22 @@ import { formatCurrency } from '../../utils/formatters'
 function SpendingByCategory({ data }) {
   const total = data.reduce((sum, item) => sum + item.amount, 0)
 
+  if (data.length === 0) {
+    return (
+      <Card>
+        <Card.Header>
+          <Card.Title>Spending by Category</Card.Title>
+          <Card.Description>Where your money goes</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <div className="h-64 flex items-center justify-center">
+            <p className="text-gray-500 dark:text-gray-400">No expenses to display</p>
+          </div>
+        </Card.Content>
+      </Card>
+    )
+  }
+
   return (
     <Card>
       <Card.Header>
@@ -23,9 +39,10 @@ function SpendingByCategory({ data }) {
                 outerRadius={80}
                 paddingAngle={5}
                 dataKey="amount"
+                nameKey="name"
               >
                 {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color || '#6366f1'} />
                 ))}
               </Pie>
               <Tooltip
@@ -47,10 +64,10 @@ function SpendingByCategory({ data }) {
               <div className="flex items-center gap-2">
                 <div
                   className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: item.color }}
+                  style={{ backgroundColor: item.color || '#6366f1' }}
                 />
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {item.category}
+                  {item.name || item.category}
                 </span>
               </div>
               <div className="flex items-center gap-2">

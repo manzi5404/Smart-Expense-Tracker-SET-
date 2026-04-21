@@ -6,23 +6,28 @@ const TOKEN_KEY = 'token'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY))
   const [isLoading, setIsLoading] = useState(true)
 
-  // Check for existing session on mount
   useEffect(() => {
     const storedToken = localStorage.getItem(TOKEN_KEY)
     if (storedToken) {
       setToken(storedToken)
-      // Decode token to get user ID (optional, full user from profile)
-      try {
-        // Could verify token here if needed
-        setIsLoading(false)
-      } catch {
-        localStorage.removeItem(TOKEN_KEY)
-      }
+      api.getProfile()
+        .then(response => {
+          const userData = response.data || response
+          setUser(userData)
+        })
+        .catch(() => {
+          localStorage.removeItem(TOKEN_KEY)
+          setToken(null)
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
+    } else {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }, [])
 
   const login = useCallback(async (email, password) => {
@@ -65,7 +70,7 @@ export function AuthProvider({ children }) {
     user,
     token,
     isLoading,
-    isAuthenticated: !!token && !!user,
+    isAuthenticated: !!token,
     login,
     register,
     logout,

@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useApp } from '../context/AppContext'
-import { getCategorySpending, getMonthlyData } from '../data/mockData'
+import api from '../services/api'
 import Card from '../components/common/Card'
 import SpendingByCategory from '../components/charts/SpendingByCategory'
 import IncomeVsExpense from '../components/charts/IncomeVsExpense'
@@ -8,17 +8,123 @@ import MonthlyTrend from '../components/charts/MonthlyTrend'
 import { formatCurrency } from '../utils/formatters'
 import { TrendingUp, TrendingDown, PiggyBank, Calendar } from 'lucide-react'
 
-function Reports() {
-  const { getTotalIncome, getTotalExpenses, getBalance, transactions } = useApp()
-  const [period, setPeriod] = useState('month')
+const parseTransactionDate = (dateStr) => {
+  if (!dateStr) return new Date()
+  const date = new Date(dateStr)
+  return isNaN(date.getTime()) ? new Date() : date
+}
 
-  const totalIncome = getTotalIncome()
-  const totalExpenses = getTotalExpenses()
-  const balance = getBalance()
+const getPeriodStart = (period) => {
+  const now = new Date()
+  let startDate
+  if (period === 'week') {
+    startDate = new Date(now)
+    startDate.setDate(startDate.getDate() - 6)
+  } else if (period === 'month') {
+    startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+  } else {
+    startDate = new Date(now.getFullYear(), 0, 1)
+  }
+  return startDate
+}
+
+function Reports() {
+  const { transactions, getCategoryName, getCategoryColor } = useApp()
+  const [period, setPeriod] = useState('month')
+  const [spendingData, setSpendingData] = useState([])
+  const [monthlyChartData, setMonthlyChartData] = useState([])
+  const [summary, setSummary] = useState({ totalIncome: 0, totalExpenses: 0, balance: 0 })
+  const [loadingReports, setLoadingReports] = useState(false)
+
+  const extractData = (res) => res?.data || res || []
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      setLoadingReports(true)
+      try {
+        const [summaryRes, spendingRes, trendRes] = await Promise.all([
+          api.getSummary(period),
+          api.getSpendingByCategory(period),
+          api.getMonthlyTrend(6)
+        ])
+
+        const summaryData = extractData(summaryRes)
+        setSummary(summaryData)
+
+        const spending = extractData(spendingRes)
+        setSpendingData(spending.map(item => ({
+          category: item.category,
+          name: item.name || item.category,
+          amount: item.amount,
+          color: item.color || getCategoryColor(item.category)
+        })))
+
+        const trend = extractData(trendRes)
+        const chartData = (trend.months || []).map((month, i) => ({
+          month,
+          income: trend.income?.[i] || 0,
+          expenses: trend.expenses?.[i] || 0
+        }))
+        setMonthlyChartData(chartData)
+      } catch (err) {
+        console.error('Failed to fetch reports:', err)
+        const periodStart = getPeriodStart(period)
+        
+        const filteredTx = transactions.filter(t => {
+          const txDate = parseTransactionDate(t.date)
+          return txDate >= periodStart
+        })
+
+        const spendingByCat = {}
+        filteredTx
+          .filter(t => t.type === 'expense')
+          .forEach(t => {
+            if (!spendingByCat[t.category]) {
+              spendingByCat[t.category] = {
+                category: t.category,
+                name: getCategoryName(t.category),
+                amount: 0,
+                color: getCategoryColor(t.category)
+              }
+            }
+            spendingByCat[t.category].amount += t.amount || 0
+          })
+        
+        const totalIncome = filteredTx
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + (t.amount || 0), 0)
+        const totalExpenses = filteredTx
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + (t.amount || 0), 0)
+
+        setSpendingData(Object.values(spendingByCat))
+        setSummary({ 
+          totalIncome, 
+          totalExpenses, 
+          balance: totalIncome - totalExpenses 
+        })
+        setMonthlyChartData([])
+      } finally {
+        setLoadingReports(false)
+      }
+    }
+
+    fetchReports()
+  }, [period])
+
+  const { totalIncome, totalExpenses, balance } = summary
   const savingsRate = totalIncome > 0 ? ((balance / totalIncome) * 100).toFixed(1) : 0
 
-  const categorySpending = getCategorySpending()
-  const monthlyData = getMonthlyData()
+  const periodTransactions = useMemo(() => {
+    const periodStart = getPeriodStart(period)
+    return transactions.filter(t => {
+      const txDate = parseTransactionDate(t.date)
+      return txDate >= periodStart
+    })
+  }, [transactions, period])
+
+  const periodIncomeCount = periodTransactions.filter(t => t.type === 'income').length
+  const periodExpenseCount = periodTransactions.filter(t => t.type === 'expense').length
 
   const stats = [
     {
@@ -49,7 +155,6 @@ function Reports() {
 
   return (
     <div className="space-y-6">
-      {/* Period Selector */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Reports</h1>
         <div className="flex items-center gap-2">
@@ -69,7 +174,6 @@ function Reports() {
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon
@@ -87,16 +191,13 @@ function Reports() {
         })}
       </div>
 
-      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SpendingByCategory data={categorySpending} />
-        <IncomeVsExpense data={monthlyData} />
+        <SpendingByCategory data={spendingData} />
+        <IncomeVsExpense data={monthlyChartData} />
       </div>
 
-      {/* Monthly Trend */}
-      <MonthlyTrend data={monthlyData} />
+      <MonthlyTrend data={monthlyChartData} />
 
-      {/* Summary */}
       <Card>
         <Card.Header>
           <Card.Title>Financial Summary</Card.Title>
@@ -110,7 +211,7 @@ function Reports() {
                 {formatCurrency(totalIncome)}
               </p>
               <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                from {transactions.filter(t => t.type === 'income').length} transactions
+                from {periodIncomeCount} transactions
               </p>
             </div>
 
@@ -120,7 +221,7 @@ function Reports() {
                 {formatCurrency(totalExpenses)}
               </p>
               <p className="text-sm text-red-600 dark:text-red-400 mt-1">
-                from {transactions.filter(t => t.type === 'expense').length} transactions
+                from {periodExpenseCount} transactions
               </p>
             </div>
 

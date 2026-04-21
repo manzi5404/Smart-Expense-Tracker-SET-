@@ -3,8 +3,17 @@ const { DataTypes } = require('sequelize');
 const Category = (sequelize) => {
   return sequelize.define('Category', {
     id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true
+    },
+    user_id: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: 'users',
+        key: 'id'
+      }
     },
     name: {
       type: DataTypes.STRING,
@@ -24,7 +33,8 @@ const Category = (sequelize) => {
     }
   }, {
     tableName: 'categories',
-    timestamps: false
+    timestamps: true,
+    underscored: true
   });
 };
 

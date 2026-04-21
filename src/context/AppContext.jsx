@@ -4,44 +4,73 @@ import { useAuth } from './AuthContext'
 
 const AppContext = createContext()
 
+const extractData = (response) => {
+  if (!response) return null
+  if (response.data !== undefined) {
+    const data = response.data
+    if (data.transactions !== undefined) return data.transactions
+    return data
+  }
+  return response
+}
+
 export function AppProvider({ children }) {
   const [transactions, setTransactions] = useState([])
   const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, token } = useAuth()
 
-  // Load data on mount/auth change
-  useEffect(() => {
-    if (!isAuthenticated) return
-
-    const loadData = async () => {
-      try {
-        setIsLoading(true)
-        setError(null)
-        
-        const [transactionsRes, categoriesRes] = await Promise.all([
-          api.getTransactions(),
-          api.getCategories()
-        ])
-        
-        setTransactions(transactionsRes.data || transactionsRes || [])
-        setCategories(categoriesRes.data || categoriesRes || [])
-      } catch (err) {
-        console.error('Failed to load data:', err)
-        setError(err.message)
-        setTransactions([])
-        setCategories([])
-      } finally {
-        setIsLoading(false)
-      }
+  const loadData = useCallback(async () => {
+    if (!token) {
+      setIsLoading(false)
+      return
     }
+    
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      const [transactionsRes, categoriesRes] = await Promise.all([
+        api.getTransactions(),
+        api.getCategories()
+      ])
+      
+      let loadedCategories = extractData(categoriesRes) || []
+      
+      if (!loadedCategories || loadedCategories.length === 0) {
+        try {
+          const seedRes = await api.seedCategories()
+          loadedCategories = extractData(seedRes) || []
+        } catch (seedErr) {
+          console.log('Seed categories failed:', seedErr.message)
+        }
+      }
+      
+      setTransactions(extractData(transactionsRes) || [])
+      setCategories(loadedCategories || [])
+    } catch (err) {
+      console.error('Failed to load data:', err)
+      setError(err.message)
+      setTransactions([])
+      setCategories([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [token])
 
-    loadData()
-  }, [isAuthenticated])
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      loadData()
+    } else if (!isAuthenticated) {
+      setTransactions([])
+      setCategories([])
+      setIsLoading(false)
+    }
+  }, [isAuthenticated, token, loadData])
 
   const refreshData = useCallback(async () => {
-    if (!isAuthenticated) return
+    if (!token) return
     
     try {
       setIsLoading(true)
@@ -50,20 +79,31 @@ export function AppProvider({ children }) {
         api.getCategories()
       ])
       
-      setTransactions(transactionsRes.data || transactionsRes || [])
-      setCategories(categoriesRes.data || categoriesRes || [])
+      setTransactions(extractData(transactionsRes) || [])
+      setCategories(extractData(categoriesRes) || [])
     } catch (err) {
       console.error('Failed to refresh:', err)
     } finally {
       setIsLoading(false)
     }
-  }, [isAuthenticated])
+  }, [token])
+
+  const refreshCategories = useCallback(async () => {
+    if (!token) return
+    
+    try {
+      const categoriesRes = await api.getCategories()
+      setCategories(extractData(categoriesRes) || [])
+    } catch (err) {
+      console.error('Failed to refresh categories:', err)
+    }
+  }, [token])
 
   const addTransaction = useCallback(async (transaction) => {
     try {
       const newTransaction = await api.addTransaction(transaction)
       await refreshData()
-      return newTransaction.data || newTransaction
+      return extractData(newTransaction)
     } catch (err) {
       console.error('Add transaction failed:', err)
       throw err
@@ -89,6 +129,41 @@ export function AppProvider({ children }) {
       throw err
     }
   }, [refreshData])
+
+  const addCategory = useCallback(async (categoryData) => {
+    try {
+      const newCategory = await api.createCategory(categoryData)
+      await refreshCategories()
+      return extractData(newCategory)
+    } catch (err) {
+      console.error('Add category failed:', err)
+      throw err
+    }
+  }, [refreshCategories])
+
+  const deleteCategory = useCallback(async (id) => {
+    try {
+      await api.deleteCategory(id)
+      await refreshCategories()
+    } catch (err) {
+      console.error('Delete category failed:', err)
+      throw err
+    }
+  }, [refreshCategories])
+
+  const getCategoryById = useCallback((id) => {
+    return categories.find(c => c.id === id)
+  }, [categories])
+
+  const getCategoryName = useCallback((id) => {
+    const cat = categories.find(c => c.id === id)
+    return cat ? cat.name : id
+  }, [categories])
+
+  const getCategoryColor = useCallback((id) => {
+    const cat = categories.find(c => c.id === id)
+    return cat ? cat.color : '#6366f1'
+  }, [categories])
 
   const getTransactionsByType = useCallback((type) => {
     return transactions.filter(t => t.type === type)
@@ -117,10 +192,12 @@ export function AppProvider({ children }) {
   const getSpendingByCategory = useCallback(() => {
     const expenses = transactions.filter(t => t.type === 'expense')
     return expenses.reduce((acc, t) => {
-      acc[t.category] = (acc[t.category] || 0) + (t.amount || 0)
+      const name = getCategoryName(t.category)
+      acc[t.category] = acc[t.category] || { name, amount: 0, color: getCategoryColor(t.category) }
+      acc[t.category].amount += t.amount || 0
       return acc
     }, {})
-  }, [transactions])
+  }, [transactions, getCategoryName, getCategoryColor])
 
   const value = {
     transactions,
@@ -129,9 +206,15 @@ export function AppProvider({ children }) {
     error,
     setIsLoading,
     refreshData,
+    refreshCategories,
     addTransaction,
     updateTransaction,
     deleteTransaction,
+    addCategory,
+    deleteCategory,
+    getCategoryById,
+    getCategoryName,
+    getCategoryColor,
     getTransactionsByType,
     getTransactionsByCategory,
     getTotalIncome,

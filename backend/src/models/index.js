@@ -15,7 +15,8 @@ Budget.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 User.hasOne(NotificationSettings, { foreignKey: 'user_id', as: 'notificationSettings' });
 NotificationSettings.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
-// Categories are global - no direct user association
+User.hasMany(Category, { foreignKey: 'user_id', as: 'categories' });
+Category.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 module.exports = {
   sequelize,

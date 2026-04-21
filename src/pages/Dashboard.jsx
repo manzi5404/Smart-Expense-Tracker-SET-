@@ -2,6 +2,7 @@ import { useApp } from '../context/AppContext'
 import StatsCard from '../components/dashboard/StatsCard'
 import RecentTransactions from '../components/dashboard/RecentTransactions'
 import QuickActions from '../components/dashboard/QuickActions'
+import FinancialTipsCard from '../components/dashboard/FinancialTipsCard'
 import { formatCurrency } from '../utils/formatters'
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
@@ -88,18 +89,7 @@ function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Monthly Tip
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Track your spending daily to identify patterns and make better financial decisions.
-            Small changes can lead to big savings over time.
-          </p>
-          <button className="text-primary-600 dark:text-primary-400 font-medium hover:underline">
-            Learn more →
-          </button>
-        </div>
+        <FinancialTipsCard period="month" transactions={transactions} />
       </div>
     </div>
   )
