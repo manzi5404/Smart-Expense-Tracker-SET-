@@ -33,7 +33,7 @@ function HowItWorks() {
           className={`text-center mb-16 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            How It Works
+            How It{' '}
             <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
               Works
             </span>

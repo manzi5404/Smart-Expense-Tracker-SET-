@@ -28,7 +28,7 @@ function Hero({ isAuthenticated }) {
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
-              Take Control of Your Finances
+              Take Control of Your{' '}
               <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
                 Finances
               </span>
@@ -94,7 +94,7 @@ function Hero({ isAuthenticated }) {
                   </svg>
                 ))}
                 <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
-                  1.2 rating
+                  2.9 rating
                 </span>
               </div>
             </div>
@@ -138,12 +138,12 @@ function Hero({ isAuthenticated }) {
                   </div>
 
                   {/* Chart Placeholder */}
-                  <div className="h-32 min-h-[120px] bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-lg flex items-end justify-around px-4 py-2">
+                  <div className="h-32 bg-gradient-to-r from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 rounded-lg flex items-end justify-around px-4 py-2">
                     {[40, 65, 45, 80, 55, 70, 50].map((h, i) => (
                       <div
                         key={i}
-                        className="w-4 sm:w-6 bg-gradient-to-t from-primary-500 to-accent-500 rounded-t"
-                        style={{ height: `${h}%`, minHeight: '6px' }}
+                        className="w-6 bg-gradient-to-t from-primary-500 to-accent-500 rounded-t"
+                        style={{ height: `${h}%` }}
                       />
                     ))}
                   </div>
