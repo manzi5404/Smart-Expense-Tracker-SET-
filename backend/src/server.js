@@ -9,16 +9,22 @@ const startServer = async () => {
     await sequelize.authenticate();
     console.log('✅ Database connection established successfully');
 
-    console.log('🚀 Server ready - Run `npm run db:reset` first to create tables');
+    try {
+      await sequelize.sync();
+      console.log('✅ Database tables synchronized');
+    } catch (syncError) {
+      console.warn('⚠️ Table sync skipped:', syncError.message);
+    }
+
+    const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1';
     
-    app.listen(PORT, '127.0.0.1', () => {
-      console.log(`\n🎉 Server running on http://127.0.0.1:${PORT}`);
-      console.log(`📋 API Docs: http://localhost:${PORT}/api/health`);
+    app.listen(PORT, host, () => {
+      console.log(`\n🎉 Server running on http://${host}:${PORT}`);
       console.log(`🔐 Auth: POST /api/auth/register & /api/auth/login`);
-      console.log(`📊 Test: http://localhost:${PORT}/api/health`);
+      console.log(`📊 Test: GET /api/health`);
     });
   } catch (error) {
-    console.error('❌ Unable to start server:', error);
+    console.error('❌ Unable to start server:', error.message);
     process.exit(1);
   }
 };
