@@ -22,10 +22,13 @@ apiClient.interceptors.response.use(
   }
 );
 
-const getAuthConfig = () => {
+apiClient.interceptors.request.use(config => {
   const token = localStorage.getItem('token');
-  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-};
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const api = {
   auth: {
@@ -35,60 +38,60 @@ export const api = {
     resetPassword: (token, newPassword) => apiClient.post('/auth/reset-password', { token, newPassword })
   },
   transactions: {
-    getAll: (params) => apiClient.get('/transactions', { params, ...getAuthConfig() }),
-    get: (id) => apiClient.get(`/transactions/${id}`, getAuthConfig()),
-    create: (data) => apiClient.post('/transactions', data, getAuthConfig()),
-    update: (id, data) => apiClient.put(`/transactions/${id}`, data, getAuthConfig()),
-    delete: (id) => apiClient.delete(`/transactions/${id}`, getAuthConfig())
+    getAll: (params) => apiClient.get('/transactions', { params }),
+    get: (id) => apiClient.get(`/transactions/${id}`),
+    create: (data) => apiClient.post('/transactions', data),
+    update: (id, data) => apiClient.put(`/transactions/${id}`, data),
+    delete: (id) => apiClient.delete(`/transactions/${id}`)
   },
   categories: {
-    getAll: () => apiClient.get('/categories', getAuthConfig()),
-    create: (data) => apiClient.post('/categories', data, getAuthConfig()),
-    seed: () => apiClient.post('/categories/seed', {}, getAuthConfig()),
-    delete: (id) => apiClient.delete(`/categories/${id}`, getAuthConfig())
+    getAll: () => apiClient.get('/categories'),
+    create: (data) => apiClient.post('/categories', data),
+    seed: () => apiClient.post('/categories/seed', {}),
+    delete: (id) => apiClient.delete(`/categories/${id}`)
   },
   reports: {
-    getSummary: (period) => apiClient.get(`/reports/summary?period=${period}`, getAuthConfig()),
-    getSpending: (period) => apiClient.get(`/reports/spending?period=${period}`, getAuthConfig()),
-    getTrend: (months) => apiClient.get(`/reports/trend?months=${months}`, getAuthConfig())
+    getSummary: (period) => apiClient.get(`/reports/summary?period=${period}`),
+    getSpending: (period) => apiClient.get(`/reports/spending?period=${period}`),
+    getTrend: (months) => apiClient.get(`/reports/trend?months=${months}`)
   },
   budgets: {
-    getAll: () => apiClient.get('/budgets', getAuthConfig()),
-    create: (data) => apiClient.post('/budgets', data, getAuthConfig()),
-    update: (id, data) => apiClient.put(`/budgets/${id}`, data, getAuthConfig()),
-    delete: (id) => apiClient.delete(`/budgets/${id}`, getAuthConfig())
+    getAll: () => apiClient.get('/budgets'),
+    create: (data) => apiClient.post('/budgets', data),
+    update: (id, data) => apiClient.put(`/budgets/${id}`, data),
+    delete: (id) => apiClient.delete(`/budgets/${id}`)
   },
   profile: {
-    get: () => apiClient.get('/profile', getAuthConfig()),
-    update: (data) => apiClient.put('/profile', data, getAuthConfig())
+    get: () => apiClient.get('/profile'),
+    update: (data) => apiClient.put('/profile', data)
   },
   notifications: {
-    get: () => apiClient.get('/notifications', getAuthConfig()),
-    update: (data) => apiClient.put('/notifications', data, getAuthConfig())
+    get: () => apiClient.get('/notifications'),
+    update: (data) => apiClient.put('/notifications', data)
   },
 
   login: (email, password) => apiClient.post('/auth/login', { email, password }),
   register: (name, email, password) => apiClient.post('/auth/register', { name, email, password }),
-  getProfile: () => apiClient.get('/profile', getAuthConfig()),
-  updateProfile: (data) => apiClient.put('/profile', data, getAuthConfig()),
-  getTransactions: (params) => apiClient.get('/transactions', { params, ...getAuthConfig() }),
-  getTransaction: (id) => apiClient.get(`/transactions/${id}`, getAuthConfig()),
-  addTransaction: (data) => apiClient.post('/transactions', data, getAuthConfig()),
-  updateTransaction: (id, data) => apiClient.put(`/transactions/${id}`, data, getAuthConfig()),
-  deleteTransaction: (id) => apiClient.delete(`/transactions/${id}`, getAuthConfig()),
-  getCategories: () => apiClient.get('/categories', getAuthConfig()),
-  createCategory: (data) => apiClient.post('/categories', data, getAuthConfig()),
-  seedCategories: () => apiClient.post('/categories/seed', {}, getAuthConfig()),
-  deleteCategory: (id) => apiClient.delete(`/categories/${id}`, getAuthConfig()),
-  getSummary: (period) => apiClient.get(`/reports/summary?period=${period}`, getAuthConfig()),
-  getSpendingByCategory: (period) => apiClient.get(`/reports/spending?period=${period}`, getAuthConfig()),
-  getMonthlyTrend: (months) => apiClient.get(`/reports/trend?months=${months}`, getAuthConfig()),
-  getBudgets: () => apiClient.get('/budgets', getAuthConfig()),
-  createBudget: (data) => apiClient.post('/budgets', data, getAuthConfig()),
-  updateBudget: (id, data) => apiClient.put(`/budgets/${id}`, data, getAuthConfig()),
-  deleteBudget: (id) => apiClient.delete(`/budgets/${id}`, getAuthConfig()),
-  getNotificationSettings: () => apiClient.get('/notifications', getAuthConfig()),
-  updateNotificationSettings: (data) => apiClient.put('/notifications', data, getAuthConfig())
+  getProfile: () => apiClient.get('/profile'),
+  updateProfile: (data) => apiClient.put('/profile', data),
+  getTransactions: (params) => apiClient.get('/transactions', { params }),
+  getTransaction: (id) => apiClient.get(`/transactions/${id}`),
+  addTransaction: (data) => apiClient.post('/transactions', data),
+  updateTransaction: (id, data) => apiClient.put(`/transactions/${id}`, data),
+  deleteTransaction: (id) => apiClient.delete(`/transactions/${id}`),
+  getCategories: () => apiClient.get('/categories'),
+  createCategory: (data) => apiClient.post('/categories', data),
+  seedCategories: () => apiClient.post('/categories/seed', {}),
+  deleteCategory: (id) => apiClient.delete(`/categories/${id}`),
+  getSummary: (period) => apiClient.get(`/reports/summary?period=${period}`),
+  getSpendingByCategory: (period) => apiClient.get(`/reports/spending?period=${period}`),
+  getMonthlyTrend: (months) => apiClient.get(`/reports/trend?months=${months}`),
+  getBudgets: () => apiClient.get('/budgets'),
+  createBudget: (data) => apiClient.post('/budgets', data),
+  updateBudget: (id, data) => apiClient.put(`/budgets/${id}`, data),
+  deleteBudget: (id) => apiClient.delete(`/budgets/${id}`),
+  getNotificationSettings: () => apiClient.get('/notifications'),
+  updateNotificationSettings: (data) => apiClient.put('/notifications', data)
 };
 
 export default api;
