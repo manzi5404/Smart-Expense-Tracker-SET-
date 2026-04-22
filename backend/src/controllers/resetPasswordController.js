@@ -12,8 +12,12 @@ const forgotPassword = async (req, res) => {
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      // Don't reveal if user exists
-      return successResponse(res, null, 'If an account exists, reset instructions have been sent');
+      // Don't reveal if user exists - return same structure but without resetUrl
+      return res.status(200).json({
+        success: true,
+        resetUrl: null,
+        message: 'If an account exists, reset instructions have been sent'
+      });
     }
 
     // Generate secure token
@@ -31,7 +35,11 @@ const forgotPassword = async (req, res) => {
     console.log('🔑 Reset token generated for:', user.email);
     console.log('🔗 Reset URL:', resetUrl);
 
-    return successResponse(res, { resetUrl }, 'Password reset instructions generated');
+    return res.status(200).json({
+      success: true,
+      resetUrl,
+      message: 'Password reset instructions generated'
+    });
   } catch (error) {
     console.error('Forgot password error:', error);
     return errorResponse(res, 'Failed to send reset email', 500);
