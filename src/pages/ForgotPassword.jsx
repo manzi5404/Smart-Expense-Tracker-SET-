@@ -20,8 +20,8 @@ function ForgotPassword() {
     setError('');
     setIsLoading(true);
 
-    try {
-      await api.forgotPassword(email);
+     try {
+       await api.auth.forgotPassword(email);
       setStatus('Email sent! Check your inbox for reset instructions.');
     } catch (err) {
       setError(err.message || 'Failed to send reset email');

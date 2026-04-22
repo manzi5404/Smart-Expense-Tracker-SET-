@@ -52,11 +52,11 @@ function Reports() {
     const fetchReports = async () => {
       setLoadingReports(true)
       try {
-        const [summaryRes, spendingRes, trendRes] = await Promise.all([
-          api.getSummary(period),
-          api.getSpendingByCategory(period),
-          api.getMonthlyTrend(6)
-        ])
+         const [summaryRes, spendingRes, trendRes] = await Promise.all([
+           api.reports.getSummary(period),
+           api.reports.getSpending(period),
+           api.reports.getTrend(6)
+         ])
 
         const summaryData = summaryRes?.data?.data || summaryRes?.data || summaryRes
         setSummary(summaryData)

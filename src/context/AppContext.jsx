@@ -70,23 +70,23 @@ export function AppProvider({ children }) {
     let categoriesData = null
     let budgetsData = null
     
-    try {
-      const transactionsRes = await api.getTransactions()
-      transactionsData = extractArray(transactionsRes, 'transactions')
-      setTransactions(transactionsData)
-      console.log('[✅] Transactions loaded:', transactionsData.length)
+     try {
+       const transactionsRes = await api.transactions.getAll()
+       transactionsData = extractArray(transactionsRes, 'transactions')
+       setTransactions(transactionsData)
+       console.log('[✅] Transactions loaded:', transactionsData.length)
     } catch (err) {
       console.error('[❌] Failed to load transactions:', err.message)
       setError('Failed to load transactions')
     }
     
-    try {
-      let categoriesRes = await api.getCategories()
-      categoriesData = extractArray(categoriesRes, 'categories')
-      
-      if (!categoriesData || categoriesData.length === 0) {
-        try {
-          const seedRes = await api.seedCategories()
+     try {
+       let categoriesRes = await api.categories.getAll()
+       categoriesData = extractArray(categoriesRes, 'categories')
+       
+       if (!categoriesData || categoriesData.length === 0) {
+         try {
+           const seedRes = await api.categories.seed()
           categoriesData = extractArray(seedRes, 'categories')
           console.log('[✅] Categories seeded')
         } catch (seedErr) {
@@ -102,10 +102,10 @@ export function AppProvider({ children }) {
       }
     }
     
-    try {
-      const budgetsRes = await api.getBudgets()
-      budgetsData = extractArray(budgetsRes, 'budgets')
-      setBudgets(budgetsData)
+     try {
+       const budgetsRes = await api.budgets.getAll()
+       budgetsData = extractArray(budgetsRes, 'budgets')
+       setBudgets(budgetsData)
       console.log('[✅] Budgets loaded:', budgetsData.length)
     } catch (err) {
       console.error('[❌] Failed to load budgets:', err.message)
@@ -131,7 +131,7 @@ export function AppProvider({ children }) {
     if (!token) return
     
     try {
-      const transactionsRes = await api.getTransactions()
+      const transactionsRes = await api.transactions.getAll()
       const tx = extractArray(transactionsRes, 'transactions')
       setTransactions(tx)
       console.log('[REFRESH] Transactions:', tx.length)
@@ -139,13 +139,13 @@ export function AppProvider({ children }) {
       console.error('[REFRESH ERROR] Transactions:', err.message)
     }
     
-    try {
-      const categoriesRes = await api.getCategories()
-      let categoriesData = extractArray(categoriesRes, 'categories') || []
-      
-      if (!categoriesData || categoriesData.length === 0) {
-        try {
-          const seedRes = await api.seedCategories()
+     try {
+       const categoriesRes = await api.categories.getAll()
+       let categoriesData = extractArray(categoriesRes, 'categories') || []
+       
+       if (!categoriesData || categoriesData.length === 0) {
+         try {
+           const seedRes = await api.categories.seed()
           categoriesData = extractArray(seedRes, 'categories') || []
         } catch (seedErr) {
           console.log('Seed categories failed:', seedErr.message)
@@ -162,12 +162,12 @@ export function AppProvider({ children }) {
     if (!token) return
     console.log('[REFRESH ALL] Starting...')
     
-    try {
-      const [transactionsRes, categoriesRes, budgetsRes] = await Promise.all([
-        api.getTransactions(),
-        api.getCategories(),
-        api.getBudgets()
-      ])
+     try {
+       const [transactionsRes, categoriesRes, budgetsRes] = await Promise.all([
+         api.transactions.getAll(),
+         api.categories.getAll(),
+         api.budgets.getAll()
+       ])
       
       const tx = extractArray(transactionsRes, 'transactions')
       const cat = extractArray(categoriesRes, 'categories')
@@ -183,21 +183,21 @@ export function AppProvider({ children }) {
     }
   }, [token])
 
-  const refreshCategories = useCallback(async () => {
-    if (!token) return
-    
-    try {
-      const categoriesRes = await api.getCategories()
-      setCategories(extractArray(categoriesRes, 'categories'))
+   const refreshCategories = useCallback(async () => {
+     if (!token) return
+     
+     try {
+       const categoriesRes = await api.categories.getAll()
+       setCategories(extractArray(categoriesRes, 'categories'))
     } catch (err) {
       console.error('[REFRESH ERROR] Categories:', err)
     }
   }, [token])
 
-  const addTransaction = useCallback(async (transaction) => {
-    try {
-      const newTransaction = await api.addTransaction(transaction)
-      await refreshAll()
+   const addTransaction = useCallback(async (transaction) => {
+     try {
+       const newTransaction = await api.transactions.create(transaction)
+       await refreshAll()
       console.log('[✅] Transaction added successfully')
       return newTransaction?.data?.data || newTransaction?.data || newTransaction
     } catch (err) {
@@ -206,10 +206,10 @@ export function AppProvider({ children }) {
     }
   }, [refreshAll])
 
-  const updateTransaction = useCallback(async (id, updates) => {
-    try {
-      await api.updateTransaction(id, updates)
-      await refreshAll()
+   const updateTransaction = useCallback(async (id, updates) => {
+     try {
+       await api.transactions.update(id, updates)
+       await refreshAll()
       console.log('[✅] Transaction updated successfully')
     } catch (err) {
       console.error('[❌] Update transaction failed:', err)
@@ -217,10 +217,10 @@ export function AppProvider({ children }) {
     }
   }, [refreshAll])
 
-  const deleteTransaction = useCallback(async (id) => {
-    try {
-      await api.deleteTransaction(id)
-      await refreshAll()
+   const deleteTransaction = useCallback(async (id) => {
+     try {
+       await api.transactions.delete(id)
+       await refreshAll()
       console.log('[✅] Transaction deleted successfully')
     } catch (err) {
       console.error('[❌] Delete transaction failed:', err)
@@ -228,10 +228,10 @@ export function AppProvider({ children }) {
     }
   }, [refreshData])
 
-  const addCategory = useCallback(async (categoryData) => {
-    try {
-      const newCategory = await api.createCategory(categoryData)
-      await refreshAll()
+   const addCategory = useCallback(async (categoryData) => {
+     try {
+       const newCategory = await api.categories.create(categoryData)
+       await refreshAll()
       console.log('[✅] Category added')
       return newCategory?.data?.data || newCategory?.data || newCategory
     } catch (err) {
@@ -240,10 +240,10 @@ export function AppProvider({ children }) {
     }
   }, [refreshAll])
 
-  const deleteCategory = useCallback(async (id) => {
-    try {
-      await api.deleteCategory(id)
-      await refreshAll()
+   const deleteCategory = useCallback(async (id) => {
+     try {
+       await api.categories.delete(id)
+       await refreshAll()
       console.log('[✅] Category deleted')
     } catch (err) {
       console.error('[❌] Delete category failed:', err)
@@ -251,22 +251,22 @@ export function AppProvider({ children }) {
     }
   }, [refreshAll])
 
-  const refreshBudgets = useCallback(async () => {
-    if (!token) return
-    
-    try {
-      const budgetsRes = await api.getBudgets()
-      const loadedBudgets = extractData(budgetsRes)
+   const refreshBudgets = useCallback(async () => {
+     if (!token) return
+     
+     try {
+       const budgetsRes = await api.budgets.getAll()
+       const loadedBudgets = extractData(budgetsRes)
       setBudgets(ensureArray(loadedBudgets?.budgets || loadedBudgets))
     } catch (err) {
       console.error('Failed to refresh budgets:', err)
     }
   }, [token])
 
-  const addBudget = useCallback(async (budgetData) => {
-    try {
-      const newBudget = await api.createBudget(budgetData)
-      await refreshBudgets()
+   const addBudget = useCallback(async (budgetData) => {
+     try {
+       const newBudget = await api.budgets.create(budgetData)
+       await refreshBudgets()
       return extractData(newBudget)
     } catch (err) {
       console.error('Add budget failed:', err)
@@ -274,20 +274,20 @@ export function AppProvider({ children }) {
     }
   }, [refreshBudgets])
 
-  const updateBudget = useCallback(async (id, updates) => {
-    try {
-      await api.updateBudget(id, updates)
-      await refreshBudgets()
+   const updateBudget = useCallback(async (id, updates) => {
+     try {
+       await api.budgets.update(id, updates)
+       await refreshBudgets()
     } catch (err) {
       console.error('Update budget failed:', err)
       throw err
     }
   }, [refreshBudgets])
 
-  const deleteBudget = useCallback(async (id) => {
-    try {
-      await api.deleteBudget(id)
-      await refreshBudgets()
+   const deleteBudget = useCallback(async (id) => {
+     try {
+       await api.budgets.delete(id)
+       await refreshBudgets()
     } catch (err) {
       console.error('Delete budget failed:', err)
       throw err

@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
     console.log('[AUTH] Initializing with token:', storedToken ? 'present' : 'none');
     if (storedToken) {
       setToken(storedToken);
-      api.getProfile()
+      api.profile.get()
         .then(response => {
           console.log('[AUTH] Profile response:', response.data);
           const userData = response.data?.data || response.data || response;
@@ -34,7 +34,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = useCallback(async (email, password) => {
-    const response = await api.login(email, password)
+    const response = await api.auth.login(email, password)
     console.log('[AUTH] Login response:', response.data);
     const payload = response.data?.data || response.data || response;
     const { user: userData, token: authToken } = payload;
@@ -52,7 +52,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const register = useCallback(async (name, email, password) => {
-    const response = await api.register(name, email, password)
+    const response = await api.auth.register(name, email, password)
     console.log('[AUTH] Register response:', response.data);
     const payload = response.data?.data || response.data || response;
     const { user: userData, token: authToken } = payload;
@@ -76,7 +76,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const updateProfile = useCallback(async (updates) => {
-    const response = await api.updateProfile(updates);
+    const response = await api.profile.update(updates);
     const updatedUserData = response.data?.data || response.data || response;
     
     setUser(updatedUserData);

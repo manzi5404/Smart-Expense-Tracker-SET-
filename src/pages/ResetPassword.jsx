@@ -44,13 +44,13 @@ function ResetPassword() {
 
     setIsLoading(true);
 
-    try {
-      if (token) {
-        await api.resetPassword(token, password);
+     try {
+       if (token) {
+         await api.auth.resetPassword(token, password);
         setSuccess('Password reset successfully! Redirecting to login...');
         setTimeout(() => navigate('/login'), 2000);
-      } else {
-        await api.updateProfile({ password });
+       } else {
+         await api.profile.update({ password });
         setSuccess('Password changed successfully!');
         setTimeout(() => navigate('/dashboard'), 2000);
       }
