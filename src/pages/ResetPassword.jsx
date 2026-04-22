@@ -19,13 +19,15 @@ function ResetPassword() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const token = searchParams.get('token');
+   const token = searchParams.get('token');
 
-  useEffect(() => {
-    if (!token && !isAuthenticated) {
-      setError('Invalid or missing reset token');
-    }
-  }, [token, isAuthenticated]);
+   useEffect(() => {
+     console.log('🔍 ResetPassword - Token from URL:', token);
+     console.log('🔍 Full URL:', window.location.href);
+     if (!token && !isAuthenticated) {
+       setError('Invalid or missing reset token');
+     }
+   }, [token, isAuthenticated]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,11 +44,18 @@ function ResetPassword() {
       return;
     }
 
-    setIsLoading(true);
+     setIsLoading(true);
 
-     try {
-       if (token) {
-         await api.auth.resetPassword(token, password);
+      console.log('🔑 Attempting password reset with:', {
+        token: token,
+        tokenLength: token?.length,
+        passwordLength: password.length
+      });
+
+      try {
+        if (token) {
+          const response = await api.auth.resetPassword(token, password);
+          console.log('✅ Reset API response:', response.data);
         setSuccess('Password reset successfully! Redirecting to login...');
         setTimeout(() => navigate('/login'), 2000);
        } else {
