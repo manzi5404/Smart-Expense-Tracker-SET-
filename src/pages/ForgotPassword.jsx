@@ -26,27 +26,38 @@ function ForgotPassword() {
       const resetUrl = response.data?.resetUrl;
 
       if (resetUrl) {
+        const templateParams = {
+          email: email,
+          reset_link: resetUrl
+        };
+
+        console.log('📧 Sending EmailJS payload:', templateParams);
+
         const emailResult = await emailjs.send(
           import.meta.env.VITE_EMAILJS_SERVICE_ID,
           import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          {
-            to_email: email,
-            reset_link: resetUrl,
-            subject: 'Reset Your Password - Smart Expense Tracker'
-          },
+          templateParams,
           import.meta.env.VITE_EMAILJS_PUBLIC_KEY
         );
 
         if (emailResult.status !== 200 && emailResult.status !== 202) {
-          console.error('EmailJS error:', emailResult);
+          console.error('❌ EmailJS error:', emailResult);
           throw new Error('Failed to send reset email');
         }
+
+        console.log('✅ EmailJS sent successfully:', emailResult.status);
       }
 
       setStatus(response.data?.message || 'If an account exists, reset instructions have been sent.');
-    } catch (err) {
-      console.error('Forgot password error:', err);
-      setError(err.message || 'Failed to send reset email');
+    } catch (error) {
+      console.error('❌ EmailJS FULL ERROR:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        status: error.status,
+        statusText: error.statusText
+      });
+      setError(error.message || 'Failed to send reset email');
     } finally {
       setIsLoading(false);
     }
