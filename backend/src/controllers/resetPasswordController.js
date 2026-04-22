@@ -40,7 +40,8 @@ const forgotPassword = async (req, res) => {
       return successResponse(res, null, 'If an account exists, reset instructions have been sent');
     }
 
-    const resetUrl = `http://localhost:3000/reset-password?token=${resetToken}`;
+     const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:3000';
+     const resetUrl = `${frontendUrl.replace(/\/$/, '')}/reset-password?token=${resetToken}`;
     
     console.log('📧 Sending password reset email to:', user.email);
     
