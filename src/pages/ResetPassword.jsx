@@ -4,13 +4,11 @@ import { useTheme } from '../context/ThemeContext';
 import Button from '../components/common/Button';
 import { Lock, Eye, EyeOff, ArrowLeft, AlertCircle, CheckCircle, Sun, Moon } from 'lucide-react';
 import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
 
 function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { theme, toggleTheme } = useTheme();
-  const { token: authToken, isAuthenticated } = useAuth();
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,15 +17,12 @@ function ResetPassword() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-   const token = searchParams.get('token');
+  const token = searchParams.get('token');
 
-   useEffect(() => {
-     console.log('🔍 ResetPassword - Token from URL:', token);
-     console.log('🔍 Full URL:', window.location.href);
-     if (!token && !isAuthenticated) {
-       setError('Invalid or missing reset token');
-     }
-   }, [token, isAuthenticated]);
+  useEffect(() => {
+    console.log('🔍 ResetPassword - Token from URL:', token);
+    console.log('🔍 Full URL:', window.location.href);
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,39 +39,47 @@ function ResetPassword() {
       return;
     }
 
-     setIsLoading(true);
+    if (!token) {
+      setError('Invalid or missing reset token');
+      return;
+    }
 
-      console.log('🔑 Attempting password reset with:', {
-        token: token,
-        tokenLength: token?.length,
-        passwordLength: password.length
-      });
+    setIsLoading(true);
 
-      try {
-        if (token) {
-          const response = await api.auth.resetPassword(token, password);
-          console.log('✅ Reset API response:', response.data);
-        setSuccess('Password reset successfully! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 2000);
-       } else {
-         await api.profile.update({ password });
-        setSuccess('Password changed successfully!');
-        setTimeout(() => navigate('/dashboard'), 2000);
-      }
+    console.log('🔑 Attempting password reset with:', {
+      token: token,
+      tokenLength: token.length,
+      passwordLength: password.length
+    });
+
+    try {
+      const response = await api.auth.resetPassword(token, password);
+      console.log('✅ Reset API response:', response.data);
+
+      setSuccess('Password reset successfully! Redirecting to login...');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
+      console.error('❌ Reset password error:', err);
+      console.error('Error details:', {
+        message: err.message,
+        status: err.status,
+        response: err.response?.data
+      });
       setError(err.message || 'Failed to reset password');
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!token && !isAuthenticated) {
+  if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Invalid Reset Link</h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">The reset link is invalid or expired.</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            The reset link is invalid or expired. Please request a new password reset link.
+          </p>
           <Button onClick={() => navigate('/login')} className="bg-gray-600 hover:bg-gray-700">
             Go to Login
           </Button>
@@ -85,17 +88,15 @@ function ResetPassword() {
     );
   }
 
-  const isAuthenticatedChange = !token && isAuthenticated;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-gray-900 dark:to-gray-800 flex flex-col">
       <header className="p-4 flex justify-between items-center">
-        <button 
-          onClick={() => navigate(isAuthenticatedChange ? '/settings' : '/login')}
+        <button
+          onClick={() => navigate('/login')}
           className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
         >
           <ArrowLeft className="w-5 h-5" />
-          {isAuthenticatedChange ? 'Back to Settings' : 'Back to Login'}
+          Back to Login
         </button>
         <button
           onClick={toggleTheme}
@@ -116,12 +117,10 @@ function ResetPassword() {
               <Lock className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {isAuthenticatedChange ? 'Change Password' : 'Reset Password'}
+              Reset Password
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {isAuthenticatedChange 
-                ? 'Enter your new password' 
-                : 'Enter your new password for your account'}
+              Enter your new password for your account
             </p>
           </div>
 
@@ -143,7 +142,7 @@ function ResetPassword() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {isAuthenticatedChange ? 'New Password' : 'New Password'}
+                  New Password
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -196,15 +195,18 @@ function ResetPassword() {
                 loading={isLoading}
                 disabled={password !== confirmPassword}
               >
-                {isAuthenticatedChange ? 'Change Password' : 'Reset Password'}
+                Reset Password
               </Button>
             </form>
           </div>
         </div>
       </main>
+
+      <div className="mt-6 text-xs text-center text-gray-500 dark:text-gray-400">
+        This link is valid for 30 minutes. If you didn't request a password reset, you can ignore this email.
+      </div>
     </div>
   );
 }
 
 export default ResetPassword;
-
