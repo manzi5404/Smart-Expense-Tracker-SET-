@@ -43,13 +43,20 @@ const forgotPassword = async (req, res) => {
      const frontendUrl = process.env.CORS_ORIGIN || 'http://localhost:3000';
      const resetUrl = `${frontendUrl.replace(/\/$/, '')}/reset-password?token=${resetToken}`;
     
-    console.log('📧 Sending password reset email to:', user.email);
-    
-    try {
-      const emailResult = await resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to: user.email,
-        subject: 'Reset Your Password - Smart Expense Tracker',
+     console.log('📧 Sending password reset email to:', user.email);
+     console.log('📧 Email config:', {
+       from: 'onboarding@resend.dev',
+       to: user.email,
+       subject: 'Reset Your Password - Smart Expense Tracker',
+       resetUrl: resetUrl,
+       resendApiKeyPrefix: process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY.substring(0, 15) : 'missing'
+     });
+     
+     try {
+       const emailResult = await resend.emails.send({
+         from: 'onboarding@resend.dev',
+         to: user.email,
+         subject: 'Reset Your Password - Smart Expense Tracker',
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #1f2937;">Reset Your Password</h2>
@@ -67,16 +74,26 @@ const forgotPassword = async (req, res) => {
       
       console.log('📧 Email send result:', emailResult);
       
-      if (emailResult.error) {
-        console.error('❌ Resend error:', emailResult.error);
-        return errorResponse(res, 'Failed to send reset email', 500);
-      }
+       if (emailResult.error) {
+         console.error('❌ Resend error:', {
+           error: emailResult.error,
+           fullResult: emailResult
+         });
+         return errorResponse(res, 'Failed to send reset email', 500);
+       }
       
       return successResponse(res, null, 'Password reset email sent');
-    } catch (emailError) {
-      console.error('❌ Email send exception:', emailError);
-      return errorResponse(res, 'Failed to send reset email', 500);
-    }
+     } catch (emailError) {
+       console.error('❌ Email send exception:', {
+         message: emailError.message,
+         stack: emailError.stack,
+         code: emailError.code,
+         statusCode: emailError.statusCode,
+         response: emailError.response ? JSON.stringify(emailError.response) : null,
+         body: emailError.body
+       });
+       return errorResponse(res, 'Failed to send reset email', 500);
+     }
   } catch (error) {
     console.error('Forgot password error:', error);
     return errorResponse(res, 'Failed to send reset email', 500);
