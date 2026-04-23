@@ -11,7 +11,7 @@ import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from '
 
 function Dashboard() {
   const { getTotalIncome, getTotalExpenses, getBalance, transactions, categories, isLoading, refreshAll } = useApp()
-  const { shouldShowOnboarding, startOnboarding } = useOnboarding()
+  const { shouldShowGuidedOnboarding, startGuidedOnboarding } = useOnboarding()
 
   // Ensure data is loaded when dashboard mounts
   useEffect(() => {
@@ -21,13 +21,13 @@ function Dashboard() {
     }
   }, [isLoading, transactions.length, categories.length, refreshAll])
 
-  // Check if onboarding should start
+  // Check if guided onboarding should start
   useEffect(() => {
-    if (!isLoading && shouldShowOnboarding(categories.length > 0, transactions.length > 0)) {
+    if (!isLoading && shouldShowGuidedOnboarding(categories.length > 0, transactions.length > 0)) {
       // Small delay to ensure UI is ready
-      setTimeout(() => startOnboarding(), 1000)
+      setTimeout(() => startGuidedOnboarding(), 1000)
     }
-  }, [isLoading, categories.length, transactions.length, shouldShowOnboarding, startOnboarding])
+  }, [isLoading, categories.length, transactions.length, shouldShowGuidedOnboarding, startOnboarding])
 
   const safeTransactions = Array.isArray(transactions) ? transactions : []
   const totalIncome = getTotalIncome()
@@ -73,8 +73,8 @@ function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-6" data-onboarding="dashboard-welcome">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" data-onboarding="dashboard-overview">
         {stats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}

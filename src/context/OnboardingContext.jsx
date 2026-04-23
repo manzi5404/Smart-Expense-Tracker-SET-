@@ -33,6 +33,12 @@ export function OnboardingProvider({ children }) {
     setIsOnboardingActive(true)
   }, [])
 
+  // Start guided onboarding
+  const startGuidedOnboarding = useCallback(() => {
+    setCurrentStep(ONBOARDING_STEPS.WELCOME)
+    setIsOnboardingActive(true)
+  }, [])
+
   // Next step
   const nextStep = useCallback(() => {
     switch (currentStep) {
@@ -82,12 +88,21 @@ export function OnboardingProvider({ children }) {
     setIsOnboardingActive(true)
   }, [])
 
+  // Check if user should see onboarding
+  const shouldShowGuidedOnboarding = useCallback((hasCategories, hasTransactions) => {
+    if (onboardingCompleted) return false
+    // Show guided onboarding if user has no data or just started
+    return !hasCategories && !hasTransactions
+  }, [onboardingCompleted])
+
   const value = {
     currentStep,
     isOnboardingActive,
     onboardingCompleted,
     shouldShowOnboarding,
+    shouldShowGuidedOnboarding,
     startOnboarding,
+    startGuidedOnboarding,
     nextStep,
     completeOnboarding,
     skipOnboarding,

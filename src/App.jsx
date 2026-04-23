@@ -6,7 +6,7 @@ import ProtectedRoute from './components/common/ProtectedRoute'
 import Layout from './components/layout/Layout'
 import MainLayout from './components/layout/MainLayout'
 import ToastContainer from './components/common/ToastContainer'
-import OnboardingTour from './components/onboarding/OnboardingTour'
+import GuidedOnboarding from './components/onboarding/GuidedOnboarding'
 import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
@@ -70,7 +70,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
           <ToastContainer />
-          <OnboardingTour />
+          <GuidedOnboarding />
         </div>
         </AuthProvider>
         </OnboardingProvider>

@@ -140,6 +140,7 @@ function Categories() {
           onClick={() => setShowModal(true)}
           icon={<Plus className="w-4 h-4" />}
           className="w-full sm:w-auto min-w-fit"
+          data-onboarding="new-category-btn"
         >
           New Category
         </Button>
