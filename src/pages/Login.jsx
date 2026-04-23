@@ -28,7 +28,7 @@ function Login() {
 
     try {
       await login(formData.email, formData.password)
-      navigate('/dashboard', { replace: true })
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {
@@ -43,7 +43,7 @@ function Login() {
 
   // Redirect if already logged in
   if (token) {
-    navigate('/dashboard', { replace: true })
+    navigate('/', { replace: true })
     return null
   }
 

@@ -28,7 +28,7 @@ function Register() {
 
   // Redirect if already logged in
   if (token) {
-    navigate('/dashboard', { replace: true })
+    navigate('/', { replace: true })
     return null
   }
 
@@ -50,7 +50,7 @@ function Register() {
 
     try {
       await register(formData.name, formData.email, formData.password)
-      navigate('/dashboard', { replace: true })
+      navigate('/', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {
