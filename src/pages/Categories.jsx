@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCategories } from '../hooks/useCategories'
 import { useApp } from '../context/AppContext'
+import { useToast } from '../context/ToastContext'
 import Card from '../components/common/Card'
 import Button from '../components/common/Button'
 import Modal from '../components/common/Modal'
@@ -14,6 +15,7 @@ const CATEGORY_ICONS = ['Tag', 'Briefcase', 'Laptop', 'TrendingUp', 'Plus', 'Ute
 function Categories() {
   const { categories, incomeCategories, expenseCategories, getCategoryStats } = useCategories()
   const { transactions, addCategory, deleteCategory } = useApp()
+  const { success, error: showError } = useToast()
 
   const [showModal, setShowModal] = useState(false)
   const [newCategory, setNewCategory] = useState({
@@ -86,6 +88,7 @@ function Categories() {
 
     try {
       await addCategory(newCategory)
+      success('Category created successfully!')
       setShowModal(false)
       setNewCategory({
         name: '',
@@ -95,6 +98,7 @@ function Categories() {
       })
     } catch (err) {
       setError(err.message || 'Failed to create category')
+      showError(err.message || 'Failed to create category')
     } finally {
       setIsCreating(false)
     }
@@ -105,9 +109,10 @@ function Categories() {
 
     try {
       await deleteCategory(deleteConfirm.id)
+      success('Category deleted successfully!')
       setDeleteConfirm(null)
     } catch (err) {
-      alert(err.message || 'Failed to delete category')
+      showError(err.message || 'Failed to delete category')
     }
   }
 

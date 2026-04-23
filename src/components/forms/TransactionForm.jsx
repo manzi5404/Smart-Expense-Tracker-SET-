@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
+import { useToast } from '../../context/ToastContext'
 import { formatCurrency } from '../../utils/formatters'
 import Button from '../common/Button'
 import Card from '../common/Card'
@@ -14,6 +15,7 @@ function TransactionForm() {
   const navigate = useNavigate()
   const location = useLocation()
   const { addTransaction, updateTransaction, categories, addCategory } = useApp()
+  const { success, error: showError } = useToast()
 
   const editTransaction = location.state?.editTransaction
   const initialType = location.state?.type || 'expense'
@@ -33,6 +35,7 @@ function TransactionForm() {
   const [newCategoryIcon, setNewCategoryIcon] = useState(CATEGORY_ICONS[0])
   const [creatingCategory, setCreatingCategory] = useState(false)
   const [categoryError, setCategoryError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (editTransaction) {
@@ -65,9 +68,11 @@ function TransactionForm() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
+
+    setIsSubmitting(true)
 
     const transactionData = {
       type: formData.type,
@@ -77,13 +82,20 @@ function TransactionForm() {
       description: formData.description.trim(),
     }
 
-    if (editTransaction) {
-      updateTransaction(editTransaction.id, transactionData)
-    } else {
-      addTransaction(transactionData)
+    try {
+      if (editTransaction) {
+        await updateTransaction(editTransaction.id, transactionData)
+        success('Transaction updated successfully!')
+      } else {
+        await addTransaction(transactionData)
+        success('Transaction added successfully!')
+      }
+      navigate('/transactions')
+    } catch (err) {
+      showError(err.message || 'Failed to save transaction')
+    } finally {
+      setIsSubmitting(false)
     }
-
-    navigate('/transactions')
   }
 
   const handleChange = (field, value) => {
@@ -292,8 +304,10 @@ function TransactionForm() {
               type="submit"
               icon={<Save className="w-4 h-4" />}
               className="flex-1"
+              disabled={isSubmitting}
+              loading={isSubmitting}
             >
-              {editTransaction ? 'Update' : 'Save'} Transaction
+              {isSubmitting ? 'Saving...' : (editTransaction ? 'Update' : 'Save') + ' Transaction'}
             </Button>
           </div>
         </form>
