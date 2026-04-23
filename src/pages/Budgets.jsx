@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { useApp } from '../context/AppContext'
+import { useToast } from '../context/ToastContext'
 import { Plus, Edit2, Trash2, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react'
 
 function Budgets() {
   const { budgets, categories, addBudget, updateBudget, deleteBudget, transactions } = useApp()
+  const { success, error } = useToast()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [formData, setFormData] = useState({
@@ -38,13 +40,16 @@ function Budgets() {
     try {
       if (editingId) {
         await updateBudget(editingId, budgetData)
+        success('Budget updated successfully!')
       } else {
         await addBudget(budgetData)
+        success('Budget created successfully!')
       }
       setFormData({ category: '', limit_amount: '', period: 'monthly' })
       setShowForm(false)
       setEditingId(null)
     } catch (err) {
+      error(err.message || 'Failed to save budget')
       console.error('Failed to save budget:', err)
     }
   }
@@ -61,7 +66,12 @@ function Budgets() {
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this budget?')) {
-      await deleteBudget(id)
+      try {
+        await deleteBudget(id)
+        success('Budget deleted successfully!')
+      } catch (err) {
+        error(err.message || 'Failed to delete budget')
+      }
     }
   }
 

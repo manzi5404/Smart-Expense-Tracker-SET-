@@ -29,6 +29,7 @@ function Categories() {
   const [isCreating, setIsCreating] = useState(false)
   const [error, setError] = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const renderCategoryCard = (category) => {
     const stats = getCategoryStats(category.id)
@@ -115,12 +116,16 @@ function Categories() {
   const handleDeleteCategory = async () => {
     if (!deleteConfirm) return
 
+    setIsDeleting(true)
+
     try {
       await deleteCategory(deleteConfirm.id)
       success('Category deleted successfully!')
       setDeleteConfirm(null)
     } catch (err) {
       showError(err.message || 'Failed to delete category')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -352,9 +357,10 @@ function Categories() {
             <Button
               type="button"
               onClick={handleDeleteCategory}
+              disabled={isDeleting}
               className="flex-1 bg-red-500 hover:bg-red-600 text-white"
             >
-              Delete
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>
           </div>
         </div>

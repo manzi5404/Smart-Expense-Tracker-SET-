@@ -28,7 +28,7 @@ function Toast({ toast, onRemove }) {
   const Icon = icons[toast.type] || Info
 
   return (
-    <div className={`fixed top-4 right-4 z-50 max-w-sm w-full ${colors[toast.type]} border rounded-lg p-4 shadow-lg animate-fade-in`}>
+    <div className={`${colors[toast.type]} border rounded-lg p-4 shadow-lg animate-fade-in-up max-w-sm w-full`}>
       <div className="flex items-start gap-3">
         <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
@@ -48,8 +48,10 @@ function Toast({ toast, onRemove }) {
 function ToastContainer() {
   const { toasts, removeToast } = useToast()
 
+  if (toasts.length === 0) return null
+
   return (
-    <div className="fixed top-0 right-0 z-50 p-4 space-y-2">
+    <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full">
       {toasts.map(toast => (
         <Toast
           key={toast.id}
