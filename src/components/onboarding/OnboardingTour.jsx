@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useOnboarding, ONBOARDING_STEPS } from '../../context/OnboardingContext'
 import { useApp } from '../../context/AppContext'
-import Modal from './common/Modal'
-import Button from './common/Button'
+import Modal from '../common/Modal'
+import Button from '../common/Button'
 import { ArrowRight, X, Sparkles, Plus, Receipt, BarChart3 } from 'lucide-react'
 
 function OnboardingTour() {
