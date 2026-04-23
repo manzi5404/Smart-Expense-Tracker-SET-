@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useApp } from '../context/AppContext'
+import { useOnboarding } from '../context/OnboardingContext'
 import StatsCard from '../components/dashboard/StatsCard'
 import RecentTransactions from '../components/dashboard/RecentTransactions'
 import QuickActions from '../components/dashboard/QuickActions'
@@ -10,6 +11,7 @@ import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from '
 
 function Dashboard() {
   const { getTotalIncome, getTotalExpenses, getBalance, transactions, categories, isLoading, refreshAll } = useApp()
+  const { shouldShowOnboarding, startOnboarding } = useOnboarding()
 
   // Ensure data is loaded when dashboard mounts
   useEffect(() => {
@@ -18,6 +20,14 @@ function Dashboard() {
       refreshAll()
     }
   }, [isLoading, transactions.length, categories.length, refreshAll])
+
+  // Check if onboarding should start
+  useEffect(() => {
+    if (!isLoading && shouldShowOnboarding(categories.length > 0, transactions.length > 0)) {
+      // Small delay to ensure UI is ready
+      setTimeout(() => startOnboarding(), 1000)
+    }
+  }, [isLoading, categories.length, transactions.length, shouldShowOnboarding, startOnboarding])
 
   const safeTransactions = Array.isArray(transactions) ? transactions : []
   const totalIncome = getTotalIncome()

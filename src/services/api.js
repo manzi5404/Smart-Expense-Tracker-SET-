@@ -69,7 +69,7 @@ export const api = {
   categories: {
     getAll: () => apiClient.get('/categories'),
     create: (data) => apiClient.post('/categories', data),
-    seed: () => apiClient.post('/categories/seed', {}),
+
     delete: (id) => apiClient.delete(`/categories/${id}`)
   },
   reports: {
@@ -103,7 +103,7 @@ export const api = {
   deleteTransaction: (id) => apiClient.delete(`/transactions/${id}`),
   getCategories: () => apiClient.get('/categories'),
   createCategory: (data) => apiClient.post('/categories', data),
-  seedCategories: () => apiClient.post('/categories/seed', {}),
+
   deleteCategory: (id) => apiClient.delete(`/categories/${id}`),
   getSummary: (period) => apiClient.get(`/reports/summary?period=${period}`),
   getSpendingByCategory: (period) => apiClient.get(`/reports/spending?period=${period}`),

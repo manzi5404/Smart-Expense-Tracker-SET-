@@ -80,19 +80,9 @@ export function AppProvider({ children }) {
       setError('Failed to load transactions')
     }
     
-     try {
-       let categoriesRes = await api.categories.getAll()
-       categoriesData = extractArray(categoriesRes, 'categories')
-       
-       if (!categoriesData || categoriesData.length === 0) {
-         try {
-           const seedRes = await api.categories.seed()
-          categoriesData = extractArray(seedRes, 'categories')
-          console.log('[✅] Categories seeded')
-        } catch (seedErr) {
-          console.log('[❌] Seed categories failed:', seedErr.message)
-        }
-      }
+      try {
+        const categoriesRes = await api.categories.getAll()
+        categoriesData = extractArray(categoriesRes, 'categories')
       setCategories(categoriesData)
       console.log('[✅] Categories loaded:', categoriesData.length)
     } catch (err) {
@@ -139,19 +129,10 @@ export function AppProvider({ children }) {
       console.error('[REFRESH ERROR] Transactions:', err.message)
     }
     
-     try {
-       const categoriesRes = await api.categories.getAll()
-       let categoriesData = extractArray(categoriesRes, 'categories') || []
-       
-       if (!categoriesData || categoriesData.length === 0) {
-         try {
-           const seedRes = await api.categories.seed()
-          categoriesData = extractArray(seedRes, 'categories') || []
-        } catch (seedErr) {
-          console.log('Seed categories failed:', seedErr.message)
-        }
-      }
-      setCategories(categoriesData)
+      try {
+        const categoriesRes = await api.categories.getAll()
+        const categoriesData = extractArray(categoriesRes, 'categories')
+        setCategories(categoriesData)
       console.log('[REFRESH] Categories:', categoriesData.length)
     } catch (err) {
       console.error('[REFRESH ERROR] Categories:', err.message)

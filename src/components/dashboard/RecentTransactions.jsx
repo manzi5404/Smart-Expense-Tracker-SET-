@@ -3,7 +3,7 @@ import { useApp } from '../../context/AppContext'
 import Card from '../common/Card'
 import Badge from '../common/Badge'
 import { formatCurrency, formatDateRelative, getCategoryName, getCategoryColor } from '../../utils/formatters'
-import { ArrowUpRight, ArrowDownRight, ArrowRight } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, ArrowRight, Receipt, Plus } from 'lucide-react'
 
 function RecentTransactions() {
   const navigate = useNavigate()
@@ -34,13 +34,24 @@ function RecentTransactions() {
           </div>
         ) : recentTransactions.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400">No transactions yet</p>
-            <button
-              onClick={() => navigate('/add')}
-              className="mt-4 text-primary-600 dark:text-primary-400 font-medium hover:underline"
-            >
-              Add your first transaction →
-            </button>
+            <div className="max-w-sm mx-auto">
+              <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Receipt className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+                No Transactions Yet
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">
+                Start tracking your expenses and income to see insights here.
+              </p>
+              <button
+                onClick={() => navigate('/add')}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Add Transaction
+              </button>
+            </div>
           </div>
         ) : (
           <div className="space-y-3">

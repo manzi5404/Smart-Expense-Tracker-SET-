@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useCategories } from '../hooks/useCategories'
 import { useApp } from '../context/AppContext'
 import { useToast } from '../context/ToastContext'
+import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext'
 import Card from '../components/common/Card'
 import Button from '../components/common/Button'
 import Modal from '../components/common/Modal'
@@ -16,6 +17,7 @@ function Categories() {
   const { categories, incomeCategories, expenseCategories, getCategoryStats } = useCategories()
   const { transactions, addCategory, deleteCategory } = useApp()
   const { success, error: showError } = useToast()
+  const { currentStep, nextStep } = useOnboarding()
 
   const [showModal, setShowModal] = useState(false)
   const [newCategory, setNewCategory] = useState({
@@ -89,6 +91,12 @@ function Categories() {
     try {
       await addCategory(newCategory)
       success('Category created successfully!')
+
+      // Advance onboarding if in create category step
+      if (currentStep === ONBOARDING_STEPS.CREATE_CATEGORY) {
+        nextStep()
+      }
+
       setShowModal(false)
       setNewCategory({
         name: '',
@@ -144,13 +152,23 @@ function Categories() {
           </div>
         ) : (
           <Card className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400 mb-4">No income categories yet</p>
-            <Button onClick={() => {
-              setNewCategory(prev => ({ ...prev, type: 'income' }))
-              setShowModal(true)
-            }} icon={<Plus className="w-4 h-4" />}>
-              Create Income Category
-            </Button>
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Plus className="w-8 h-8 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                No Income Categories Yet
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
+                Create categories for your income sources like salary, freelance work, or investments.
+              </p>
+              <Button onClick={() => {
+                setNewCategory(prev => ({ ...prev, type: 'income' }))
+                setShowModal(true)
+              }} icon={<Plus className="w-4 h-4" />}>
+                Create Income Category
+              </Button>
+            </div>
           </Card>
         )}
       </section>
@@ -167,13 +185,23 @@ function Categories() {
           </div>
         ) : (
           <Card className="text-center py-8">
-            <p className="text-gray-500 dark:text-gray-400 mb-4">No expense categories yet</p>
-            <Button onClick={() => {
-              setNewCategory(prev => ({ ...prev, type: 'expense' }))
-              setShowModal(true)
-            }} icon={<Plus className="w-4 h-4" />}>
-              Create Expense Category
-            </Button>
+            <div className="max-w-md mx-auto">
+              <div className="w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Plus className="w-8 h-8 text-red-600 dark:text-red-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                No Expense Categories Yet
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
+                Organize your spending by creating categories like food, transport, bills, or entertainment.
+              </p>
+              <Button onClick={() => {
+                setNewCategory(prev => ({ ...prev, type: 'expense' }))
+                setShowModal(true)
+              }} icon={<Plus className="w-4 h-4" />}>
+                Create Expense Category
+              </Button>
+            </div>
           </Card>
         )}
       </section>

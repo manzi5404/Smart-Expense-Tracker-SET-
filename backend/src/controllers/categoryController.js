@@ -99,41 +99,11 @@ const deleteCategory = async (req, res) => {
   }
 };
 
-const seedCategories = async (req, res) => {
-  try {
-    const userId = req.userId;
 
-    const existingCategories = await Category.findAll({
-      where: { user_id: userId }
-    });
-
-    if (existingCategories.length > 0) {
-      return successResponse(res, existingCategories, 'Categories already exist', 200);
-    }
-
-    const categories = await Promise.all(
-      DEFAULT_CATEGORIES.map(cat =>
-        Category.create({
-          user_id: userId,
-          name: cat.name,
-          type: cat.type,
-          icon: cat.icon,
-          color: cat.color
-        })
-      )
-    );
-
-    return successResponse(res, categories, 'Default categories created successfully', 201);
-  } catch (error) {
-    console.error('Seed categories error:', error);
-    return errorResponse(res, 'Failed to seed categories', 500);
-  }
-};
 
 module.exports = {
   getCategories,
   createCategory,
-  deleteCategory,
-  seedCategories
+  deleteCategory
 };
 

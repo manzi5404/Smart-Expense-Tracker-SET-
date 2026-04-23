@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { useToast } from '../../context/ToastContext'
+import { useOnboarding, ONBOARDING_STEPS } from '../../context/OnboardingContext'
 import { formatCurrency } from '../../utils/formatters'
 import Button from '../common/Button'
 import Card from '../common/Card'
@@ -16,6 +17,7 @@ function TransactionForm() {
   const location = useLocation()
   const { addTransaction, updateTransaction, categories, addCategory } = useApp()
   const { success, error: showError } = useToast()
+  const { currentStep, nextStep } = useOnboarding()
 
   const editTransaction = location.state?.editTransaction
   const initialType = location.state?.type || 'expense'
@@ -89,6 +91,11 @@ function TransactionForm() {
       } else {
         await addTransaction(transactionData)
         success('Transaction added successfully!')
+
+        // Advance onboarding if in add transaction step
+        if (currentStep === ONBOARDING_STEPS.ADD_TRANSACTION) {
+          nextStep()
+        }
       }
       navigate('/transactions')
     } catch (err) {
