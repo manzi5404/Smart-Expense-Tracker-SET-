@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import Layout from './components/layout/Layout'
+import MainLayout from './components/layout/MainLayout'
 import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
@@ -30,14 +31,16 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           
-          {/* Static pages */}
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/updates" element={<Updates />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/help" element={<HelpCenter />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
+          {/* Public pages with layout */}
+          <Route element={<MainLayout />}>
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/updates" element={<Updates />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
+          </Route>
 
           {/* Protected routes */}
           <Route

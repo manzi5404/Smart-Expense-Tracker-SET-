@@ -57,15 +57,14 @@ const forgotPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
+    // STEP 1 — REQUEST BODY VERIFICATION
+    console.log('========== STEP 1: REQUEST BODY VERIFICATION ==========');
+    console.log('REQ BODY (raw):', JSON.stringify(req.body));
     const { token, newPassword } = req.body;
-
-    console.log('🔐 [RESET DEBUG] Received request body:', {
-      hasToken: !!token,
-      tokenLength: token?.length,
-      tokenPreview: token ? token.substring(0, 10) + '...' : 'none',
-      hasNewPassword: !!newPassword,
-      newPasswordLength: newPassword?.length
-    });
+    console.log('TOKEN RECEIVED:', token);
+    console.log('TOKEN LENGTH:', token?.length);
+    console.log('NEWPASSWORD RECEIVED:', newPassword ? 'present' : 'missing');
+    console.log('========================================================');
 
     if (!token || !newPassword) {
       return errorResponse(res, 'Token and new password required', 400);
@@ -75,9 +74,12 @@ const resetPassword = async (req, res) => {
       return errorResponse(res, 'Password must be at least 6 characters', 400);
     }
 
-    console.log('🔐 [RESET DEBUG] Searching for user with token:', token.substring(0, 20) + '...');
-    console.log('🔐 [RESET DEBUG] Current time:', new Date().toISOString());
-    console.log('🔐 [RESET DEBUG] Checking expiry - should be > now');
+    // STEP 2 — DATABASE LOOKUP VERIFICATION
+    console.log('========== STEP 2: DATABASE LOOKUP VERIFICATION ==========');
+    console.log('LOOKING UP TOKEN:', token);
+    console.log('LOOKING UP TOKEN (first 20 chars):', token.substring(0, 20) + '...');
+    console.log('Current server time:', new Date().toISOString());
+    console.log('Checking expiry: reset_token_expiry > now?');
 
     const user = await User.findOne({
       where: {
@@ -88,22 +90,29 @@ const resetPassword = async (req, res) => {
       }
     });
 
+    console.log('USER FOUND (with valid expiry):', user ? 'YES' : 'NO');
+
     if (!user) {
-      console.log('❌ [RESET DEBUG] No user found with given token. Checking if token exists but expired...');
-      // Check if token exists at all (expired)
+      console.log('❌ No user found with given token AND valid expiry. Performing fallback check...');
+      // Check if token exists at all (maybe expired)
       const userExpired = await User.findOne({
         where: { reset_token: token }
       });
       if (userExpired) {
-        console.log('⏰ [RESET DEBUG] Token found but expired. Expiry:', userExpired.reset_token_expiry);
+        console.log('⏰ TOKEN FOUND BUT EXPIRED. Expiry:', userExpired.reset_token_expiry);
+        console.log('⏰ Current time:', new Date().toISOString());
+        console.log('⏰ Expired? EXPIRY <= NOW:', new Date(userExpired.reset_token_expiry) <= new Date());
       } else {
-        console.log('🔍 [RESET DEBUG] Token not found in database at all');
+        console.log('🔍 TOKEN NOT FOUND IN DATABASE AT ALL');
+        console.log('🔍 This means: (a) token never saved, (b) token overwritten, or (c) wrong token value');
       }
       return errorResponse(res, 'Invalid or expired token', 400);
     }
 
-    console.log('✅ [RESET DEBUG] User found, token valid. User ID:', user.id);
-    console.log('✅ [RESET DEBUG] Token expiry:', user.reset_token_expiry);
+    console.log('✅ USER FOUND with valid token');
+    console.log('✅ User ID:', user.id);
+    console.log('✅ User email:', user.email);
+    console.log('✅ Token expiry (valid until):', user.reset_token_expiry);
 
     await user.update({
       password_hash: newPassword,

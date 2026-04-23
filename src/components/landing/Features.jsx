@@ -44,10 +44,12 @@ function Features() {
           ref={ref}
           className={`text-center mb-16 ${isVisible ? 'animate-fade-in' : 'opacity-0'}`}
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                Everything You Need To Manage Your Finances
-    
-          </h2>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
+             Everything You Need To Manage Your{' '}
+              <span className="bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent">
+                Finances
+              </span>
+            </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Powerful features designed to help you take control of your money and build better financial habits.
           </p>

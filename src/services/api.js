@@ -34,6 +34,16 @@ apiClient.interceptors.request.use(
     } else {
       console.warn('[API] No token found in localStorage');
     }
+
+    // DEBUG: Log outgoing request config for reset-password endpoint
+    if (config.url?.includes('/auth/reset-password')) {
+      console.log('📤 [AXIOS DEBUG] Request config:');
+      console.log('  URL:', config.url);
+      console.log('  Method:', config.method);
+      console.log('  Headers:', config.headers);
+      console.log('  Data:', config.data);
+    }
+
     return config;
   },
   error => {

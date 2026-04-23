@@ -46,13 +46,18 @@ function ResetPassword() {
 
     setIsLoading(true);
 
-    console.log('🔑 Attempting password reset with:', {
-      token: token,
-      tokenLength: token.length,
-      passwordLength: password.length
-    });
+    console.log('🔑 [FRONTEND DEBUG] Raw token from URL searchParams:', token);
+    console.log('🔑 [FRONTEND DEBUG] Token type:', typeof token);
+    console.log('🔑 [FRONTEND DEBUG] Token length:', token?.length);
+    console.log('🔑 [FRONTEND DEBUG] Token characters (first 10+last 10):', token ? token.substring(0, 10) + '...' + token.substring(token.length - 10) : 'null');
+    console.log('🔑 [FRONTEND DEBUG] Token exact repr:', JSON.stringify(token));
 
+    // Make the API call with detailed request logging
     try {
+      const payload = { token, newPassword: password };
+      console.log('📤 [FRONTEND DEBUG] Request payload about to send:', payload);
+      console.log('📤 [FRONTEND DEBUG] Payload JSON:', JSON.stringify(payload));
+
       const response = await api.auth.resetPassword(token, password);
       console.log('✅ Reset API response:', response.data);
 

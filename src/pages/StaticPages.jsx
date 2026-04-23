@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowLeft, CheckCircle, Star, Zap, Shield, Users, TrendingUp, PieChart, Target, Calendar, Bell, Smartphone } from 'lucide-react'
+import { CheckCircle, Star, Zap, Shield, Users, TrendingUp, PieChart, Target, Calendar, Bell, Smartphone } from 'lucide-react'
 import Card from '../components/common/Card'
 
 const features = [
@@ -41,26 +41,9 @@ const features = [
   }
 ]
 
-function StaticPage({ title, children }) {
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-20 pb-12">
-      <div className="max-w-6xl mx-auto px-4">
-        <Link 
-          to="/" 
-          className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 mb-8"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Home
-        </Link>
-        {children}
-      </div>
-    </div>
-  )
-}
-
 export function Features() {
   return (
-    <StaticPage title="Features">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Smart Finance Control for Everyone in{' '}
@@ -75,7 +58,7 @@ export function Features() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {features.map((feature, index) => (
-          <div 
+          <div
             key={index}
             className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
           >
@@ -95,20 +78,20 @@ export function Features() {
       <div className="mt-16 bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-8 text-center">
         <h2 className="text-2xl font-bold text-white mb-4">Ready to take control of your finances?</h2>
         <p className="text-white/90 mb-6">Start tracking your expenses today - completely free</p>
-        <Link 
-          to="/register" 
+        <Link
+          to="/register"
           className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
         >
           Get Started Free
         </Link>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
 export function Pricing() {
   return (
-    <StaticPage title="Pricing">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Simple and Transparent Pricing
@@ -127,7 +110,7 @@ export function Pricing() {
           <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
             Smart Expense Tracker is currently free to use while we continue building the best financial tracking experience for Rwanda and beyond.
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
               <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-3" />
@@ -156,7 +139,7 @@ export function Pricing() {
           </div>
         </div>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
@@ -183,7 +166,7 @@ export function Updates() {
   ]
 
   return (
-    <StaticPage title="Updates">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           What's New in SET
@@ -195,7 +178,7 @@ export function Updates() {
 
       <div className="max-w-3xl mx-auto space-y-6">
         {updates.map((update, index) => (
-          <div 
+          <div
             key={index}
             className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700"
           >
@@ -232,13 +215,13 @@ export function Updates() {
           </ul>
         </div>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
 export function About() {
   return (
-    <StaticPage title="About">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Built in{' '}
@@ -297,7 +280,7 @@ export function About() {
           Building the future of personal finance for East Africa
         </p>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
@@ -326,7 +309,7 @@ export function HelpCenter() {
   ]
 
   return (
-    <StaticPage title="Help Center">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           We're Here to Help
@@ -338,7 +321,7 @@ export function HelpCenter() {
 
       <div className="max-w-3xl mx-auto space-y-4">
         {helpTopics.map((topic, index) => (
-          <details 
+          <details
             key={index}
             className="group bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700"
           >
@@ -365,27 +348,27 @@ export function HelpCenter() {
           Contact us directly and we'll get back to you within 24-48 hours.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <a 
-            href="mailto:manziluckyun@gmail.com" 
+          <a
+            href="mailto:manziluckyun@gmail.com"
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
             Email Support
           </a>
-          <a 
-            href="tel:+250791832523" 
+          <a
+            href="tel:+250791832523"
             className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             Call +250 791 832 523
           </a>
         </div>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
 export function Contact() {
   return (
-    <StaticPage title="Contact">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="text-center mb-16">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           Get in Touch
@@ -403,7 +386,7 @@ export function Contact() {
               <Card.Description>For general inquiries and support</Card.Description>
             </Card.Header>
             <Card.Content>
-              <a 
+              <a
                 href="mailto:manziluckyun@gmail.com"
                 className="text-lg text-primary-600 dark:text-primary-400 hover:underline"
               >
@@ -419,7 +402,7 @@ export function Contact() {
               <Card.Description>Mon-Fri, 9am-5pm CAT</Card.Description>
             </Card.Header>
             <Card.Content>
-              <a 
+              <a
                 href="tel:+250791832523"
                 className="text-lg text-primary-600 dark:text-primary-400 hover:underline"
               >
@@ -442,16 +425,16 @@ export function Contact() {
           </Card>
         </div>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
 export function Privacy() {
   return (
-    <StaticPage title="Privacy Policy">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Privacy Policy</h1>
-        
+
         <div className="space-y-6 text-gray-600 dark:text-gray-400">
           <section>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Data We Collect</h2>
@@ -491,16 +474,16 @@ export function Privacy() {
           </section>
         </div>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
 export function Terms() {
   return (
-    <StaticPage title="Terms of Service">
+    <div className="max-w-6xl mx-auto px-4 pt-20 pb-12">
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">Terms of Service</h1>
-        
+
         <div className="space-y-6 text-gray-600 dark:text-gray-400">
           <section>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Acceptance of Terms</h2>
@@ -539,8 +522,7 @@ export function Terms() {
           </section>
         </div>
       </div>
-    </StaticPage>
+    </div>
   )
 }
 
-export default StaticPage
