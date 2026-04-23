@@ -1,13 +1,23 @@
+import { useEffect } from 'react'
 import { useApp } from '../context/AppContext'
 import StatsCard from '../components/dashboard/StatsCard'
 import RecentTransactions from '../components/dashboard/RecentTransactions'
 import QuickActions from '../components/dashboard/QuickActions'
 import FinancialTipsCard from '../components/dashboard/FinancialTipsCard'
+import Loading from '../components/common/Loading'
 import { formatCurrency } from '../utils/formatters'
 import { TrendingUp, TrendingDown, Wallet, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 
 function Dashboard() {
-  const { getTotalIncome, getTotalExpenses, getBalance, transactions } = useApp()
+  const { getTotalIncome, getTotalExpenses, getBalance, transactions, categories, isLoading, refreshAll } = useApp()
+
+  // Ensure data is loaded when dashboard mounts
+  useEffect(() => {
+    if (!isLoading && transactions.length === 0 && categories.length === 0) {
+      console.log('[Dashboard] Data not loaded, triggering refresh...')
+      refreshAll()
+    }
+  }, [isLoading, transactions.length, categories.length, refreshAll])
 
   const safeTransactions = Array.isArray(transactions) ? transactions : []
   const totalIncome = getTotalIncome()
@@ -43,6 +53,14 @@ function Dashboard() {
       color: 'blue',
     },
   ]
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loading size="lg" />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">

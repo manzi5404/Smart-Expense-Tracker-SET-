@@ -7,7 +7,7 @@ import { ArrowUpRight, ArrowDownRight, ArrowRight } from 'lucide-react'
 
 function RecentTransactions() {
   const navigate = useNavigate()
-  const { transactions, categories } = useApp()
+  const { transactions, categories, isLoading } = useApp()
 
   const safeTransactions = Array.isArray(transactions) ? transactions : []
   const recentTransactions = safeTransactions.slice(0, 5)
@@ -28,7 +28,11 @@ function RecentTransactions() {
         </button>
       </Card.Header>
       <Card.Content>
-        {recentTransactions.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">Loading transactions...</p>
+          </div>
+        ) : recentTransactions.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">No transactions yet</p>
             <button
