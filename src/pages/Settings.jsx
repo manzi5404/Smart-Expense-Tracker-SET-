@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
-import { useOnboarding } from '../context/OnboardingContext'
 import {
   Settings as SettingsIcon,
   Palette,
@@ -14,13 +13,11 @@ import {
   Mail,
   AlertTriangle,
   FileText,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from 'lucide-react'
 
 function Settings() {
   const { theme, toggleTheme } = useTheme()
-  const { onboardingCompleted, resetOnboarding, startOnboarding } = useOnboarding()
   const navigate = useNavigate()
   
   const [preferences, setPreferences] = useState({
@@ -218,39 +215,9 @@ function Settings() {
             <ChevronRight className="w-5 h-5 text-gray-400" />
           </button>
         </div>
-      </div>
+       </div>
 
-      {/* Onboarding Section */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-primary-600" />
-          Getting Started
-        </h2>
-
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-5 h-5 text-gray-400" />
-                <div>
-                  <p className="text-gray-900 dark:text-white font-medium">Tutorial</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {onboardingCompleted ? 'Replay the guided tutorial' : 'Complete the getting started guide'}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={onboardingCompleted ? resetOnboarding : startOnboarding}
-                className="px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
-              >
-                {onboardingCompleted ? 'Replay Tutorial' : 'Start Tutorial'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* App Info */}
+       {/* App Info */}
       <div className="text-center text-sm text-gray-500 dark:text-gray-400">
         <p>Smart Expense Tracker v1.0.0</p>
         <p className="mt-1">Made with ❤️</p>

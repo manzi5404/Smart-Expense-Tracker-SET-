@@ -33,7 +33,7 @@ function QuickActions() {
   ]
 
   return (
-    <Card data-onboarding="add-transaction-btn">
+    <Card>
       <Card.Header>
         <Card.Title>Quick Actions</Card.Title>
       </Card.Header>

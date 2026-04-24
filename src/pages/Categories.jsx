@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useCategories } from '../hooks/useCategories'
 import { useApp } from '../context/AppContext'
 import { useToast } from '../context/ToastContext'
-import { useOnboarding, ONBOARDING_STEPS } from '../context/OnboardingContext'
 import Card from '../components/common/Card'
 import Button from '../components/common/Button'
 import Modal from '../components/common/Modal'
@@ -17,7 +16,6 @@ function Categories() {
   const { categories, incomeCategories, expenseCategories, getCategoryStats } = useCategories()
   const { transactions, addCategory, deleteCategory } = useApp()
   const { success, error: showError } = useToast()
-  const { currentStep, nextStep } = useOnboarding()
 
   const [showModal, setShowModal] = useState(false)
   const [newCategory, setNewCategory] = useState({
@@ -93,11 +91,6 @@ function Categories() {
       await addCategory(newCategory)
       success('Category created successfully!')
 
-      // Advance onboarding if in create category step
-      if (currentStep === ONBOARDING_STEPS.CREATE_CATEGORY) {
-        nextStep()
-      }
-
       setShowModal(false)
       setNewCategory({
         name: '',
@@ -140,7 +133,6 @@ function Categories() {
           onClick={() => setShowModal(true)}
           icon={<Plus className="w-4 h-4" />}
           className="w-full sm:w-auto min-w-fit"
-          data-onboarding="new-category-btn"
         >
           New Category
         </Button>

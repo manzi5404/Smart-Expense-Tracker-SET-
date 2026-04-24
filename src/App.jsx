@@ -1,12 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
-import { OnboardingProvider } from './context/OnboardingContext'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import Layout from './components/layout/Layout'
 import MainLayout from './components/layout/MainLayout'
 import ToastContainer from './components/common/ToastContainer'
-import GuidedOnboarding from './components/onboarding/GuidedOnboarding'
 import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
@@ -26,8 +24,7 @@ function App() {
   return (
     <BrowserRouter>
       <ToastProvider>
-        <OnboardingProvider>
-          <AuthProvider>
+        <AuthProvider>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 prevent-overflow" style={{ overflowX: 'visible', maxWidth: 'none' }}>
           <Routes>
           {/* Public routes */}
@@ -70,10 +67,8 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
           <ToastContainer />
-          <GuidedOnboarding />
         </div>
-        </AuthProvider>
-        </OnboardingProvider>
+      </AuthProvider>
       </ToastProvider>
     </BrowserRouter>
   )

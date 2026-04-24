@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
 import { useToast } from '../../context/ToastContext'
-import { useOnboarding, ONBOARDING_STEPS } from '../../context/OnboardingContext'
 import { formatCurrency } from '../../utils/formatters'
 import Button from '../common/Button'
 import Card from '../common/Card'
-import Modal from '../common/Modal'
+import Modal from '../components/common/Modal'
 import { ArrowUpRight, ArrowDownRight, Save, Plus } from 'lucide-react'
 
 const CATEGORY_COLORS = ['#f59e0b', '#3b82f6', '#ec4899', '#ef4444', '#8b5cf6', '#10b981', '#06b6d4', '#0ea5e9', '#84cc16', '#f97316']
@@ -17,7 +16,6 @@ function TransactionForm() {
   const location = useLocation()
   const { addTransaction, updateTransaction, categories, addCategory } = useApp()
   const { success, error: showError } = useToast()
-  const { currentStep, nextStep } = useOnboarding()
 
   const editTransaction = location.state?.editTransaction
   const initialType = location.state?.type || 'expense'
@@ -91,11 +89,6 @@ function TransactionForm() {
       } else {
         await addTransaction(transactionData)
         success('Transaction added successfully!')
-
-        // Advance onboarding if in add transaction step
-        if (currentStep === ONBOARDING_STEPS.ADD_TRANSACTION) {
-          nextStep()
-        }
       }
       navigate('/transactions')
     } catch (err) {
